@@ -201,9 +201,9 @@ export const generateInvoiceDownloadUrl = (
 
   const baseOrigin = isLocal 
     ? window.location.origin 
-    : `https://${customSubdomain || clinic.website?.replace(/https?:\/\//, '').replace(/\/$/, '') || 'billing.smile7dental.com'}`;
+    : (customSubdomain ? `https://${customSubdomain.replace(/https?:\/\//, '').replace(/\/$/, '')}` : 'https://smile7dental.com');
 
-  return `${baseOrigin}/?view=invoice&id=${invoice.id}&token=${token}`;
+  return `${baseOrigin}/?download=invoice&id=${invoice.id}&token=${token}`;
 };
 
 export const generateWhatsAppInvoiceText = (

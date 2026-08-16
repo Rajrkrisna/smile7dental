@@ -13,7 +13,7 @@ import { TreatmentCatalog } from './components/treatments/TreatmentCatalog';
 import { PaymentHistory } from './components/payments/PaymentHistory';
 import { ClinicSettings } from './components/settings/ClinicSettings';
 import { AdminLogin } from './components/auth/AdminLogin';
-import { PatientInvoiceView } from './components/patient-portal/PatientInvoiceView';
+import { InstantInvoiceDownloader } from './components/patient-portal/InstantInvoiceDownloader';
 import { MainClinicWebsite } from './components/website/MainClinicWebsite';
 import { decodeInvoicePayload } from './utils/shareUtils';
 import type { Invoice, ClinicProfile } from './types';
@@ -31,8 +31,6 @@ const isBillingRoute = (): boolean => {
 
   // Query parameter or hash triggers
   if (
-    search.includes('view=invoice') ||
-    search.includes('token=') ||
     search.includes('portal=billing') ||
     search.includes('billing')
   ) {
@@ -52,44 +50,8 @@ interface DentalAppContentProps {
 }
 
 const DentalAppContent: React.FC<DentalAppContentProps> = ({ onBackToWebsite }) => {
-  const { isAuthenticated, getInvoiceById, clinicProfile } = useDental();
+  const { isAuthenticated } = useDental();
   const [activeTab, setActiveTab] = useState<string>('dashboard');
-  
-  // Public Patient Portal State (URL param based)
-  const [patientPortalData, setPatientPortalData] = useState<{
-    invoice: Invoice;
-    clinic: ClinicProfile;
-  } | null>(null);
-
-  // Check URL on load for patient download link: ?view=invoice&id=...&token=...
-  useEffect(() => {
-    try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const isInvoiceView = urlParams.get('view') === 'invoice';
-      const token = urlParams.get('token');
-      const invoiceId = urlParams.get('id') || urlParams.get('invoice_id');
-
-      if (isInvoiceView || token) {
-        if (token) {
-          const decoded = decodeInvoicePayload(token);
-          if (decoded) {
-            setPatientPortalData(decoded);
-            return;
-          }
-        }
-        
-        if (invoiceId) {
-          const localInv = getInvoiceById(invoiceId);
-          if (localInv) {
-            setPatientPortalData({ invoice: localInv, clinic: clinicProfile });
-            return;
-          }
-        }
-      }
-    } catch (e) {
-      console.error('Failed to parse patient portal URL:', e);
-    }
-  }, [getInvoiceById, clinicProfile]);
 
   // Modals & Sub-views State
   const [viewInvoiceId, setViewInvoiceId] = useState<string | null>(null);
@@ -120,20 +82,6 @@ const DentalAppContent: React.FC<DentalAppContentProps> = ({ onBackToWebsite }) 
     setViewInvoiceId(invoiceId);
     setInvoicePrintMode('thermal');
   };
-
-  // If a patient is viewing their invoice link, show the Patient Portal directly without admin login
-  if (patientPortalData) {
-    return (
-      <PatientInvoiceView
-        invoice={patientPortalData.invoice}
-        clinic={patientPortalData.clinic}
-        onAdminLoginClick={() => {
-          window.history.replaceState({}, '', window.location.pathname);
-          setPatientPortalData(null);
-        }}
-      />
-    );
-  }
 
   // If unauthorized, show Admin security portal
   if (!isAuthenticated) {
@@ -269,6 +217,27 @@ const DentalAppContent: React.FC<DentalAppContentProps> = ({ onBackToWebsite }) 
 };
 
 export function App() {
+  // Direct Download Detection: if token or download parameter is present in URL
+  const [directDownloadData] = useState<{
+    invoice: Invoice;
+    clinic: ClinicProfile;
+  } | null>(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      const isDownload = urlParams.get('download') === 'invoice' || urlParams.get('view') === 'invoice' || !!token;
+
+      if (isDownload && token) {
+        const decoded = decodeInvoicePayload(token);
+        if (decoded) return decoded;
+      }
+    } catch (e) {
+      console.error('Failed to parse download payload:', e);
+    }
+    return null;
+  });
+
   const [isBilling, setIsBilling] = useState<boolean>(() => isBillingRoute());
 
   // Listen to hash change / popstate for seamless browser navigation
@@ -300,6 +269,16 @@ export function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
+  // If patient opened a direct invoice download link, directly render the Instant Downloader!
+  if (directDownloadData) {
+    return (
+      <InstantInvoiceDownloader
+        invoice={directDownloadData.invoice}
+        clinic={directDownloadData.clinic}
+      />
+    );
+  }
+
   return (
     <DentalProvider>
       {isBilling ? (
@@ -312,4 +291,5 @@ export function App() {
 }
 
 export default App;
+
 
