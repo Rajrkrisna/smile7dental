@@ -1,5 +1,4 @@
 import type { Invoice, ClinicProfile, InvoiceItem } from '../types';
-import { formatCurrency, formatDate } from './formatters';
 
 export const sanitizeIndianPhoneNumber = (phoneStr: string): string => {
   // Remove all non-digit characters
@@ -18,167 +17,210 @@ export const sanitizeIndianPhoneNumber = (phoneStr: string): string => {
 };
 
 /**
- * Creates a portable, URL-safe base64 token containing the invoice snapshot
- * so patients can view and download their official invoice on any smartphone or browser.
+ * Creates a compact, URL-safe base64 token containing the invoice snapshot
+ * so patients can download their official invoice instantly on any smartphone or browser.
  */
-export const encodeInvoicePayload = (invoice: Invoice, clinic: ClinicProfile): string => {
+export const encodeInvoicePayload = (invoice: Invoice, _clinic: ClinicProfile): string => {
   try {
-    const compactData = {
-      i: {
-        id: invoice.id,
-        num: invoice.invoiceNumber,
-        dt: invoice.date,
-        due: invoice.dueDate,
-        pid: invoice.patientId,
-        pnm: invoice.patientName,
-        pph: invoice.patientPhone,
-        pag: invoice.patientAge,
-        pgn: invoice.patientGender,
-        padr: invoice.patientAddress,
-        doc: invoice.doctorName,
-        items: invoice.items.map(it => ({
-          n: it.procedureName,
-          c: it.procedureCode,
-          cat: it.category,
-          q: it.quantity,
-          p: it.unitPrice,
-          t: it.toothNumbers,
-          s: it.surface,
-          d: it.discountValue,
-          dt: it.discountType,
-          tx: it.taxPercent,
-          lt: it.lineTotal
-        })),
-        sub: invoice.subtotal,
-        tdisc: invoice.totalItemDiscount,
-        atyp: invoice.additionalDiscountType,
-        aval: invoice.additionalDiscountValue,
-        tax: invoice.totalTax,
-        tot: invoice.grandTotal,
-        pd: invoice.amountPaid,
-        dueAmt: invoice.balanceDue,
-        st: invoice.status,
-        note: invoice.clinicalNotes,
-        rx: invoice.prescriptions,
-        nxt: invoice.nextAppointmentDate
-      },
-      c: {
-        nm: clinic.name,
-        tag: clinic.tagline,
-        doc: clinic.dentistInCharge,
-        ph: clinic.phone,
-        em: clinic.email,
-        wb: clinic.website,
-        adr: clinic.addressLine1,
-        ct: clinic.city,
-        st: clinic.state,
-        zip: clinic.zipCode,
-        tx: clinic.taxId,
-        dcn: clinic.dentalCouncilNumber,
-        cur: clinic.currencySymbol,
-        ccode: clinic.currencyCode,
-        upi: clinic.bankDetails?.upiId
-      }
-    };
+    const compactArr = [
+      invoice.id,                             // 0: id
+      invoice.invoiceNumber,                  // 1: num
+      invoice.date,                           // 2: dt
+      invoice.patientName,                    // 3: pnm
+      invoice.patientPhone || '',             // 4: pph
+      invoice.patientAge || 0,                // 5: pag
+      invoice.patientGender || '',            // 6: pgn
+      invoice.patientAddress || '',           // 7: padr
+      invoice.doctorName || '',               // 8: doc
+      invoice.subtotal,                       // 9: sub
+      invoice.totalItemDiscount + (invoice.additionalDiscountValue || 0), // 10: disc
+      invoice.totalTax,                       // 11: tax
+      invoice.grandTotal,                     // 12: tot
+      invoice.amountPaid,                     // 13: pd
+      invoice.balanceDue,                     // 14: due
+      invoice.status,                         // 15: st
+      invoice.clinicalNotes || '',            // 16: note
+      invoice.prescriptions || '',            // 17: rx
+      invoice.nextAppointmentDate || '',      // 18: nxt
+      invoice.items.map(it => [               // 19: items
+        it.procedureName,
+        it.procedureCode || 'S7D',
+        it.quantity,
+        it.unitPrice,
+        it.lineTotal,
+        it.toothNumbers || [],
+        it.surface || ''
+      ])
+    ];
 
-    const jsonStr = JSON.stringify(compactData);
-    const base64 = btoa(encodeURIComponent(jsonStr));
-    return base64;
+    const jsonStr = JSON.stringify(compactArr);
+    return btoa(encodeURIComponent(jsonStr));
   } catch (err) {
-    console.error('Failed to encode invoice payload token:', err);
+    console.error('Failed to encode compact invoice token:', err);
     return '';
   }
 };
 
 /**
- * Decodes the portable invoice token from the URL
+ * Decodes the portable invoice token from the URL (supports both compact array and legacy object schemas)
  */
 export const decodeInvoicePayload = (token: string): { invoice: Invoice; clinic: ClinicProfile } | null => {
   try {
     const jsonStr = decodeURIComponent(atob(token));
     const data = JSON.parse(jsonStr);
-    if (!data || !data.i || !data.c) return null;
+    if (!data) return null;
 
-    const i = data.i;
-    const c = data.c;
-
-    const items: InvoiceItem[] = (i.items || []).map((it: any, index: number) => ({
-      id: `item_${index}`,
-      procedureId: it.c || `proc_${index}`,
-      procedureCode: it.c || '',
-      procedureName: it.n || 'Dental Procedure',
-      category: it.cat || 'general',
-      quantity: it.q || 1,
-      unitPrice: it.p || 0,
-      toothNumbers: it.t || [],
-      surface: it.s,
-      discountType: it.dt || 'fixed',
-      discountValue: it.d || 0,
-      taxPercent: it.tx || 0,
-      lineTotal: it.lt || 0
-    }));
-
-    const invoice: Invoice = {
-      id: i.id,
-      invoiceNumber: i.num,
-      patientId: i.pid || 'PAT-TEMP',
-      patientName: i.pnm || 'Patient',
-      patientPhone: i.pph || '',
-      patientAge: i.pag || 30,
-      patientGender: i.pgn || 'other',
-      patientAddress: i.padr,
-      doctorName: i.doc || 'Dr. P. Manickapriya',
-      date: i.dt || new Date().toISOString(),
-      dueDate: i.due || i.dt || new Date().toISOString(),
-      items: items,
-      subtotal: i.sub || 0,
-      totalItemDiscount: i.tdisc || 0,
-      additionalDiscountType: i.atyp || 'fixed',
-      additionalDiscountValue: i.aval || 0,
-      totalTax: i.tax || 0,
-      grandTotal: i.tot || 0,
-      amountPaid: i.pd || 0,
-      balanceDue: i.dueAmt || 0,
-      status: i.st || 'paid',
-      payments: [],
-      clinicalNotes: i.note,
-      prescriptions: i.rx,
-      nextAppointmentDate: i.nxt,
-      createdAt: i.dt || new Date().toISOString(),
-      updatedAt: i.dt || new Date().toISOString()
-    };
-
-    const clinic: ClinicProfile = {
-      name: c.nm || 'Smile7 Dental Clinic',
-      tagline: c.tag || 'Precision Dental Care Redefined for Comfort',
-      dentistInCharge: c.doc || 'Dr. P. Manickapriya',
+    const defaultClinic: ClinicProfile = {
+      name: 'Smile7 Dental Clinic',
+      tagline: 'Precision Dental Care Redefined for Comfort',
+      dentistInCharge: 'Dr. P. Manickapriya',
       registrationNumber: '',
-      dentalCouncilNumber: c.dcn || 'Tamil Nadu Dental Council Reg. #24892',
-      taxId: c.tx || '',
-      phone: c.ph || '+91 97908 62510',
-      email: c.em || 'care@smile7dental.com',
-      website: c.wb || 'https://smile7dental.com/',
-      addressLine1: c.adr || 'No. 1/2, Alapakkam Main Road, Janaki Nagar, Maduravoyal',
+      dentalCouncilNumber: 'Tamil Nadu Dental Council Reg. #24892',
+      taxId: '',
+      phone: '+91 97908 62510',
+      email: 'care@smile7dental.com',
+      website: 'https://smile7dental.com/',
+      addressLine1: 'No. 1/2, Alapakkam Main Road, Janaki Nagar, Maduravoyal',
       addressLine2: '',
-      city: c.ct || 'Chennai',
-      state: c.st || 'Tamil Nadu',
-      zipCode: c.zip || '600095',
-      currencySymbol: c.cur || '₹',
-      currencyCode: c.ccode || 'INR',
+      city: 'Chennai',
+      state: 'Tamil Nadu',
+      zipCode: '600095',
+      currencySymbol: '₹',
+      currencyCode: 'INR',
       defaultTaxRate: 0,
       defaultToothNotation: 'fdi',
       invoicePrefix: 'S7D',
       invoiceFooterNote: 'Thank you for choosing Smile7 Dental Clinic. Please keep this invoice for warranty and clinical insurance records.',
       bankDetails: {
-        accountName: c.nm || 'Smile7 Dental Clinic',
+        accountName: 'Smile7 Dental Clinic',
         accountNumber: '',
         ifscOrRouting: '',
         bankName: '',
-        upiId: c.upi || '9790862510@okaxis'
+        upiId: '9790862510@okaxis'
       }
     };
 
-    return { invoice, clinic };
+    // Compact Array format (v2)
+    if (Array.isArray(data)) {
+      const items: InvoiceItem[] = (data[19] || []).map((it: any, index: number) => ({
+        id: `item_${index}`,
+        procedureId: it[1] || `proc_${index}`,
+        procedureCode: it[1] || 'S7D',
+        procedureName: it[0] || 'Dental Procedure',
+        category: 'general',
+        quantity: it[2] || 1,
+        unitPrice: it[3] || 0,
+        lineTotal: it[4] || 0,
+        toothNumbers: it[5] || [],
+        surface: it[6] || undefined,
+        discountType: 'fixed',
+        discountValue: 0,
+        taxPercent: 0
+      }));
+
+      const invoice: Invoice = {
+        id: data[0] || 'INV-TEMP',
+        invoiceNumber: data[1] || 'S7D-0000',
+        date: data[2] || new Date().toISOString(),
+        dueDate: data[2] || new Date().toISOString(),
+        patientId: 'PAT-PORTAL',
+        patientName: data[3] || 'Patient',
+        patientPhone: data[4] || '',
+        patientAge: data[5] || 30,
+        patientGender: data[6] || 'other',
+        patientAddress: data[7] || undefined,
+        doctorName: data[8] || 'Dr. P. Manickapriya',
+        subtotal: data[9] || 0,
+        totalItemDiscount: data[10] || 0,
+        additionalDiscountType: 'fixed',
+        additionalDiscountValue: 0,
+        totalTax: data[11] || 0,
+        grandTotal: data[12] || 0,
+        amountPaid: data[13] || 0,
+        balanceDue: data[14] || 0,
+        status: data[15] || 'paid',
+        clinicalNotes: data[16] || undefined,
+        prescriptions: data[17] || undefined,
+        nextAppointmentDate: data[18] || undefined,
+        items: items,
+        payments: [],
+        createdAt: data[2] || new Date().toISOString(),
+        updatedAt: data[2] || new Date().toISOString()
+      };
+
+      return { invoice, clinic: defaultClinic };
+    }
+
+    // Legacy Object format (v1)
+    if (data.i) {
+      const i = data.i;
+      const c = data.c || {};
+
+      const items: InvoiceItem[] = (i.items || []).map((it: any, index: number) => ({
+        id: `item_${index}`,
+        procedureId: it.c || `proc_${index}`,
+        procedureCode: it.c || '',
+        procedureName: it.n || 'Dental Procedure',
+        category: it.cat || 'general',
+        quantity: it.q || 1,
+        unitPrice: it.p || 0,
+        toothNumbers: it.t || [],
+        surface: it.s,
+        discountType: it.dt || 'fixed',
+        discountValue: it.d || 0,
+        taxPercent: it.tx || 0,
+        lineTotal: it.lt || 0
+      }));
+
+      const invoice: Invoice = {
+        id: i.id,
+        invoiceNumber: i.num,
+        patientId: i.pid || 'PAT-TEMP',
+        patientName: i.pnm || 'Patient',
+        patientPhone: i.pph || '',
+        patientAge: i.pag || 30,
+        patientGender: i.pgn || 'other',
+        patientAddress: i.padr,
+        doctorName: i.doc || 'Dr. P. Manickapriya',
+        date: i.dt || new Date().toISOString(),
+        dueDate: i.due || i.dt || new Date().toISOString(),
+        items: items,
+        subtotal: i.sub || 0,
+        totalItemDiscount: i.tdisc || 0,
+        additionalDiscountType: i.atyp || 'fixed',
+        additionalDiscountValue: i.aval || 0,
+        totalTax: i.tax || 0,
+        grandTotal: i.tot || 0,
+        amountPaid: i.pd || 0,
+        balanceDue: i.dueAmt || 0,
+        status: i.st || 'paid',
+        payments: [],
+        clinicalNotes: i.note,
+        prescriptions: i.rx,
+        nextAppointmentDate: i.nxt,
+        createdAt: i.dt || new Date().toISOString(),
+        updatedAt: i.dt || new Date().toISOString()
+      };
+
+      const clinic: ClinicProfile = {
+        ...defaultClinic,
+        name: c.nm || defaultClinic.name,
+        tagline: c.tag || defaultClinic.tagline,
+        dentistInCharge: c.doc || defaultClinic.dentistInCharge,
+        dentalCouncilNumber: c.dcn || defaultClinic.dentalCouncilNumber,
+        phone: c.ph || defaultClinic.phone,
+        email: c.em || defaultClinic.email,
+        website: c.wb || defaultClinic.website,
+        addressLine1: c.adr || defaultClinic.addressLine1,
+        city: c.ct || defaultClinic.city,
+        state: c.st || defaultClinic.state,
+        zipCode: c.zip || defaultClinic.zipCode
+      };
+
+      return { invoice, clinic };
+    }
+
+    return null;
   } catch (err) {
     console.error('Failed to decode invoice token:', err);
     return null;
@@ -186,7 +228,7 @@ export const decodeInvoicePayload = (token: string): { invoice: Invoice; clinic:
 };
 
 /**
- * Generates the permanent public download & viewing link for the patient
+ * Generates the clean, short download link for the patient
  */
 export const generateInvoiceDownloadUrl = (
   invoice: Invoice, 
@@ -203,9 +245,12 @@ export const generateInvoiceDownloadUrl = (
     ? window.location.origin 
     : (customSubdomain ? `https://${customSubdomain.replace(/https?:\/\//, '').replace(/\/$/, '')}` : 'https://smile7dental.com');
 
-  return `${baseOrigin}/?download=invoice&id=${invoice.id}&token=${token}`;
+  return `${baseOrigin}/?d=${token}`;
 };
 
+/**
+ * Confidential, clean WhatsApp notification without exposing itemized procedure and pricing details
+ */
 export const generateWhatsAppInvoiceText = (
   invoice: Invoice, 
   clinic: ClinicProfile,
@@ -213,128 +258,47 @@ export const generateWhatsAppInvoiceText = (
 ): string => {
   const downloadUrl = generateInvoiceDownloadUrl(invoice, clinic, customSubdomain);
 
-  const itemsText = invoice.items
-    .map((item, idx) => {
-      const teeth = item.toothNumbers && item.toothNumbers.length > 0 
-        ? ` [Teeth: ${item.toothNumbers.join(', ')}]` 
-        : '';
-      const surface = item.surface ? ` (Surface: ${item.surface})` : '';
-      return `${idx + 1}. *${item.procedureName}*${teeth}${surface}\n   Qty: ${item.quantity} × ${formatCurrency(item.unitPrice, clinic.currencySymbol)} = *${formatCurrency(item.lineTotal, clinic.currencySymbol)}*`;
-    })
-    .join('\n\n');
-
-  const discountLine = invoice.totalItemDiscount > 0 || invoice.additionalDiscountValue > 0
-    ? `\n• *Discount Applied:* -${formatCurrency(invoice.totalItemDiscount + (invoice.additionalDiscountValue || 0), clinic.currencySymbol)}`
-    : '';
-
-  const taxLine = invoice.totalTax > 0
-    ? `\n• *Tax / GST:* +${formatCurrency(invoice.totalTax, clinic.currencySymbol)}`
-    : '';
-
-  const paymentStatus = invoice.balanceDue === 0
-    ? '✅ *PAID IN FULL*'
-    : invoice.amountPaid > 0
-    ? `⚠️ *PARTIALLY PAID* (Balance: ${formatCurrency(invoice.balanceDue, clinic.currencySymbol)})`
-    : `🔴 *PAYMENT DUE* (${formatCurrency(invoice.balanceDue, clinic.currencySymbol)})`;
-
-  const nextAppt = invoice.nextAppointmentDate
-    ? `\n\n📅 *Scheduled Next Visit:* ${formatDate(invoice.nextAppointmentDate)}`
-    : '';
-
-  const rx = invoice.prescriptions
-    ? `\n\n💊 *Prescription (Rx):*\n${invoice.prescriptions}`
-    : '';
-
-  const upiInfo = clinic.bankDetails?.upiId
-    ? `\n\n📲 *Instant UPI Payment Handle:* ${clinic.bankDetails.upiId}`
-    : '';
-
   return `🦷 *SMILE7 DENTAL CLINIC*
-*${clinic.tagline}*
-📍 ${clinic.addressLine1}, ${clinic.city} - ${clinic.zipCode}
-📞 ${clinic.phone} | 🌐 ${clinic.website}
+Dr. P. Manickapriya (BDS) • Chennai
 
-━━━━━━━━━━━━━━━━━━━━
-📄 *DENTAL INVOICE: ${invoice.invoiceNumber}*
-📅 *Date:* ${formatDate(invoice.date)}
-👤 *Patient Name:* ${invoice.patientName} (${invoice.patientPhone})
-🩺 *Attending Doctor:* ${invoice.doctorName || clinic.dentistInCharge}
+Dear *${invoice.patientName}*,
 
-━━━━━━━━━━━━━━━━━━━━
-*TREATMENTS & PROCEDURES:*
+Thank you for your visit today. Your official dental invoice (*#${invoice.invoiceNumber}*) is ready.
 
-${itemsText}
-
-━━━━━━━━━━━━━━━━━━━━
-💰 *FINANCIAL SUMMARY:*
-• *Subtotal:* ${formatCurrency(invoice.subtotal, clinic.currencySymbol)}${discountLine}${taxLine}
-• *Grand Total:* *${formatCurrency(invoice.grandTotal, clinic.currencySymbol)}*
-• *Amount Received:* ${formatCurrency(invoice.amountPaid, clinic.currencySymbol)}
-• *Balance Due:* *${formatCurrency(invoice.balanceDue, clinic.currencySymbol)}*
-• *Status:* ${paymentStatus}${upiInfo}${rx}${nextAppt}
-
-━━━━━━━━━━━━━━━━━━━━
-📥 *DOWNLOAD OFFICIAL PDF INVOICE:*
+📥 *Click to Download Invoice (PDF):*
 👉 ${downloadUrl}
 
-━━━━━━━━━━━━━━━━━━━━
-_Thank you for choosing Smile7 Dental Clinic! Please keep this message and download link for your medical records._`;
+📍 No. 1/2, Alapakkam Main Road, Maduravoyal
+📞 +91 97908 62510 | 🌐 smile7dental.com`;
 };
 
+/**
+ * Confidential, clean Email notification without exposing itemized procedure details
+ */
 export const generateEmailInvoiceContent = (
   invoice: Invoice, 
   clinic: ClinicProfile,
   customSubdomain?: string
 ): { subject: string; body: string } => {
   const downloadUrl = generateInvoiceDownloadUrl(invoice, clinic, customSubdomain);
-  const subject = `Dental Invoice #${invoice.invoiceNumber} - Smile7 Dental Clinic (${invoice.patientName})`;
-
-  const itemsList = invoice.items
-    .map((item, idx) => {
-      const teeth = item.toothNumbers && item.toothNumbers.length > 0 ? ` [Teeth: ${item.toothNumbers.join(', ')}]` : '';
-      return `${idx + 1}. ${item.procedureName}${teeth} - Qty: ${item.quantity} - Total: ${formatCurrency(item.lineTotal, clinic.currencySymbol)}`;
-    })
-    .join('\n');
+  const subject = `Invoice #${invoice.invoiceNumber} - Smile7 Dental Clinic (${invoice.patientName})`;
 
   const body = `Dear ${invoice.patientName},
 
-Thank you for visiting Smile7 Dental Clinic. Please find below the summary and download link for your official dental tax invoice:
+Thank you for visiting Smile7 Dental Clinic.
 
-========================================
-SMILE7 DENTAL CLINIC
-Dr. P. Manickapriya (BDS)
-No. 1/2, Alapakkam Main Road, Janaki Nagar, Maduravoyal, Chennai - 600095
-Phone: +91 97908 62510 | Email: care@smile7dental.com
-========================================
+Your official dental invoice #${invoice.invoiceNumber} has been generated and is ready for download.
 
-INVOICE DETAILS:
-Invoice Number: ${invoice.invoiceNumber}
-Date: ${formatDate(invoice.date)}
-Patient Name: ${invoice.patientName}
-Attending Clinician: ${invoice.doctorName || clinic.dentistInCharge}
-
-ITEMIZED PROCEDURES:
-${itemsList}
-
-BILL SUMMARY:
-----------------------------------------
-Subtotal: ${formatCurrency(invoice.subtotal, clinic.currencySymbol)}
-Grand Total: ${formatCurrency(invoice.grandTotal, clinic.currencySymbol)}
-Amount Paid: ${formatCurrency(invoice.amountPaid, clinic.currencySymbol)}
-Balance Due: ${formatCurrency(invoice.balanceDue, clinic.currencySymbol)}
-Payment Status: ${invoice.status.toUpperCase()}
-
-${invoice.prescriptions ? `PRESCRIPTIONS (Rx):\n${invoice.prescriptions}\n\n` : ''}${invoice.clinicalNotes ? `CLINICAL NOTES:\n${invoice.clinicalNotes}\n\n` : ''}${invoice.nextAppointmentDate ? `NEXT APPOINTMENT: ${formatDate(invoice.nextAppointmentDate)}\n\n` : ''}========================================
-DOWNLOAD & PRINT OFFICIAL PDF INVOICE:
-Click the link below to view or download your official digital invoice:
+Download Your Official Invoice:
 ${downloadUrl}
-========================================
 
-For any assistance or appointments, please contact us at +91 97908 62510 or care@smile7dental.com.
+If you have any questions or require clinical follow-up, please reach out to us at +91 97908 62510 or care@smile7dental.com.
 
 Warm regards,
-Dr. P. Manickapriya & Smile7 Dental Clinic Team
-Maduravoyal, Chennai`;
+Dr. P. Manickapriya
+Smile7 Dental Clinic
+Maduravoyal, Chennai - 600095
+https://smile7dental.com`;
 
   return { subject, body };
 };
@@ -369,3 +333,4 @@ export const sendEmailInvoice = (
   const mailtoUrl = `mailto:${encodeURIComponent(emailToUse)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   window.location.href = mailtoUrl;
 };
+

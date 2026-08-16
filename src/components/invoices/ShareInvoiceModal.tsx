@@ -112,7 +112,7 @@ export const ShareInvoiceModal: React.FC<ShareInvoiceModalProps> = ({
           <div className="flex items-center justify-between">
             <span className="font-bold text-teal-950 flex items-center gap-1.5">
               <Link className="w-3.5 h-3.5 text-teal-700" />
-              Patient Download & Viewing Link:
+              Patient Direct Download Link (Short URL):
             </span>
             <div className="flex items-center gap-2">
               <button

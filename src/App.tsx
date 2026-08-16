@@ -217,7 +217,7 @@ const DentalAppContent: React.FC<DentalAppContentProps> = ({ onBackToWebsite }) 
 };
 
 export function App() {
-  // Direct Download Detection: if token or download parameter is present in URL
+  // Direct Download Detection: if short param ?d= or ?token= or ?download= is present in URL
   const [directDownloadData] = useState<{
     invoice: Invoice;
     clinic: ClinicProfile;
@@ -225,11 +225,20 @@ export function App() {
     if (typeof window === 'undefined') return null;
     try {
       const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get('token');
-      const isDownload = urlParams.get('download') === 'invoice' || urlParams.get('view') === 'invoice' || !!token;
+      const token = urlParams.get('d') || urlParams.get('token') || urlParams.get('payload');
+      
+      // Also check hash for #d=... or #/d/...
+      const hash = window.location.hash;
+      const hashToken = hash.includes('d=') 
+        ? hash.split('d=')[1]?.split('&')[0] 
+        : hash.startsWith('#/d/') 
+        ? hash.replace('#/d/', '') 
+        : null;
 
-      if (isDownload && token) {
-        const decoded = decodeInvoicePayload(token);
+      const effectiveToken = token || hashToken;
+
+      if (effectiveToken) {
+        const decoded = decodeInvoicePayload(effectiveToken);
         if (decoded) return decoded;
       }
     } catch (e) {
