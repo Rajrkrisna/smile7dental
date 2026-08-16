@@ -108,10 +108,15 @@ const DentalAppContent: React.FC<DentalAppContentProps> = ({ onBackToWebsite }) 
         <Sidebar
           activeTab={activeTab}
           onTabChange={(tab) => {
+            if (tab === 'website') {
+              onBackToWebsite();
+              return;
+            }
             setActiveTab(tab);
             setInvoicePreselectedPatientId(undefined);
           }}
           onOpenCreateInvoice={() => handleOpenCreateInvoice()}
+          onBackToWebsite={onBackToWebsite}
         />
 
         {/* Content Area */}

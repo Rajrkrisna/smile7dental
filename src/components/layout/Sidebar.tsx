@@ -7,19 +7,23 @@ import {
   Stethoscope, 
   CreditCard, 
   Settings,
-  Plus
+  Plus,
+  Globe,
+  ArrowRight
 } from 'lucide-react';
 
 interface SidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   onOpenCreateInvoice: () => void;
+  onBackToWebsite?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   onTabChange,
-  onOpenCreateInvoice
+  onOpenCreateInvoice,
+  onBackToWebsite
 }) => {
   const { invoices, patients, stats } = useDental();
 
@@ -39,7 +43,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <button
           type="button"
           onClick={onOpenCreateInvoice}
-          className="w-full py-3 px-4 bg-teal-600 hover:bg-teal-700 active:bg-teal-800 text-white font-bold text-xs rounded-2xl shadow-md shadow-teal-600/20 transition-all flex items-center justify-center gap-2"
+          className="w-full py-3 px-4 bg-teal-600 hover:bg-teal-700 active:bg-teal-800 text-white font-bold text-xs rounded-2xl shadow-md shadow-teal-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           Create Dental Bill
@@ -57,7 +61,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               key={item.id}
               type="button"
               onClick={() => onTabChange(item.id)}
-              className={`flex items-center justify-between p-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap md:w-full ${
+              className={`flex items-center justify-between p-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap md:w-full cursor-pointer ${
                 isActive
                   ? 'bg-teal-50 text-teal-800 border border-teal-200/80 shadow-xs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
@@ -78,6 +82,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           );
         })}
+
+        {onBackToWebsite && (
+          <button
+            type="button"
+            onClick={onBackToWebsite}
+            className="flex items-center justify-between p-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap md:w-full text-teal-900 bg-teal-50/80 hover:bg-teal-100/90 border border-teal-200 shadow-xs cursor-pointer mt-1"
+          >
+            <div className="flex items-center gap-3">
+              <Globe className="w-4 h-4 text-teal-700" />
+              <span>Clinic Main Page</span>
+            </div>
+            <ArrowRight className="w-3.5 h-3.5 text-teal-600 hidden md:block" />
+          </button>
+        )}
       </nav>
 
       {/* Pending Due Alert Widget */}

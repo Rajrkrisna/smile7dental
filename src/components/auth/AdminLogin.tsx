@@ -529,8 +529,19 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBackTo
           )}
 
           {/* Clinical Privacy Notice */}
-          <div className="pt-4 border-t border-slate-800/80 text-[11px] text-slate-500 text-center space-y-1">
-            <p className="flex items-center justify-center gap-1">
+          <div className="pt-4 border-t border-slate-800/80 text-[11px] text-slate-500 text-center space-y-2.5">
+            {onBackToWebsite && (
+              <button
+                type="button"
+                onClick={onBackToWebsite}
+                className="w-full py-2 px-3 bg-slate-800/70 hover:bg-slate-800 text-slate-300 hover:text-white rounded-xl text-xs font-semibold border border-slate-700/60 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Return to Clinic Main Page</span>
+              </button>
+            )}
+
+            <p className="flex items-center justify-center gap-1 text-[10px] text-slate-400">
               <ShieldCheck className="w-3 h-3 text-teal-500" />
               <span>Encrypted Access: Patient Financial & Medical Records</span>
             </p>
