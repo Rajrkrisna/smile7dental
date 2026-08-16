@@ -5,13 +5,16 @@ import type {
   DentalProcedure, 
   Invoice, 
   PaymentTransaction, 
-  ToothNotation 
+  ToothNotation,
+  AdminAuthConfig,
+  AdminUser
 } from '../types';
 import { 
   INITIAL_CLINIC_PROFILE, 
   INITIAL_PROCEDURES, 
   INITIAL_PATIENTS, 
-  INITIAL_INVOICES 
+  INITIAL_INVOICES,
+  INITIAL_ADMIN_AUTH
 } from '../data/initialData';
 
 interface DashboardStats {
@@ -49,8 +52,17 @@ interface DentalContextType {
   setToothNotation: (notation: ToothNotation) => void;
   stats: DashboardStats;
   resetToDefaults: () => void;
-  importDatabase: (data: { clinicProfile?: ClinicProfile; patients?: Patient[]; procedures?: DentalProcedure[]; invoices?: Invoice[] }) => boolean;
-  exportDatabase: () => { clinicProfile: ClinicProfile; patients: Patient[]; procedures: DentalProcedure[]; invoices: Invoice[] };
+  importDatabase: (data: { clinicProfile?: ClinicProfile; patients?: Patient[]; procedures?: DentalProcedure[]; invoices?: Invoice[]; adminAuth?: AdminAuthConfig }) => boolean;
+  exportDatabase: () => { clinicProfile: ClinicProfile; patients: Patient[]; procedures: DentalProcedure[]; invoices: Invoice[]; adminAuth: AdminAuthConfig };
+  
+  // Admin Auth State & Controls
+  adminAuth: AdminAuthConfig;
+  updateAdminAuth: (config: Partial<AdminAuthConfig>) => void;
+  isAuthenticated: boolean;
+  adminUser: AdminUser | null;
+  loginWithPin: (pin: string) => boolean;
+  loginWithPassword: (password: string) => boolean;
+  logout: () => void;
 }
 
 const DentalContext = createContext<DentalContextType | undefined>(undefined);
@@ -61,11 +73,42 @@ const STORAGE_KEYS = {
   PATIENTS: 'smile7dental_v2_patients',
   PROCEDURES: 'smile7dental_v2_procedures',
   INVOICES: 'smile7dental_v2_invoices',
-  NOTATION: 'smile7dental_v2_tooth_notation'
+  NOTATION: 'smile7dental_v2_tooth_notation',
+  ADMIN_AUTH: 'smile7dental_v2_admin_auth',
+  AUTH_SESSION: 'smile7dental_v2_auth_session'
 };
 
 export const DentalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Check if legacy storage exists and initialize with official Smile7 Dental profile
+  // Admin Auth Configuration
+  const [adminAuth, setAdminAuth] = useState<AdminAuthConfig>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.ADMIN_AUTH);
+      return saved ? JSON.parse(saved) : INITIAL_ADMIN_AUTH;
+    } catch {
+      return INITIAL_ADMIN_AUTH;
+    }
+  });
+
+  // Authentication State
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    try {
+      const session = sessionStorage.getItem(STORAGE_KEYS.AUTH_SESSION);
+      return session === 'authenticated';
+    } catch {
+      return false;
+    }
+  });
+
+  const [adminUser, setAdminUser] = useState<AdminUser | null>(() => {
+    return isAuthenticated ? {
+      name: 'Dr. P. Manickapriya',
+      email: adminAuth.adminEmail || 'care@smile7dental.com',
+      role: 'Lead Dentist & Practice Director',
+      avatarInitials: 'PM'
+    } : null;
+  });
+
+  // Load clinic profile
   const [clinicProfile, setClinicProfile] = useState<ClinicProfile>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEYS.CLINIC);
@@ -135,6 +178,10 @@ export const DentalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   // Persist whenever state changes
   useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.ADMIN_AUTH, JSON.stringify(adminAuth));
+  }, [adminAuth]);
+
+  useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.CLINIC, JSON.stringify(clinicProfile));
   }, [clinicProfile]);
 
@@ -153,6 +200,47 @@ export const DentalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.NOTATION, activeToothNotation);
   }, [activeToothNotation]);
+
+  // Auth Operations
+  const loginWithPin = (pin: string): boolean => {
+    if (pin.trim() === adminAuth.adminPin) {
+      setIsAuthenticated(true);
+      setAdminUser({
+        name: 'Dr. P. Manickapriya',
+        email: adminAuth.adminEmail,
+        role: 'Lead Dentist & Practice Director',
+        avatarInitials: 'PM'
+      });
+      sessionStorage.setItem(STORAGE_KEYS.AUTH_SESSION, 'authenticated');
+      return true;
+    }
+    return false;
+  };
+
+  const loginWithPassword = (password: string): boolean => {
+    if (password === adminAuth.adminPassword) {
+      setIsAuthenticated(true);
+      setAdminUser({
+        name: 'Dr. P. Manickapriya',
+        email: adminAuth.adminEmail,
+        role: 'Lead Dentist & Practice Director',
+        avatarInitials: 'PM'
+      });
+      sessionStorage.setItem(STORAGE_KEYS.AUTH_SESSION, 'authenticated');
+      return true;
+    }
+    return false;
+  };
+
+  const logout = () => {
+    setIsAuthenticated(false);
+    setAdminUser(null);
+    sessionStorage.removeItem(STORAGE_KEYS.AUTH_SESSION);
+  };
+
+  const updateAdminAuth = (configUpdates: Partial<AdminAuthConfig>) => {
+    setAdminAuth(prev => ({ ...prev, ...configUpdates }));
+  };
 
   const setToothNotation = (notation: ToothNotation) => {
     setToothNotationState(notation);
@@ -315,22 +403,25 @@ export const DentalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setPatients(INITIAL_PATIENTS);
     setProcedures(INITIAL_PROCEDURES);
     setInvoices(INITIAL_INVOICES);
+    setAdminAuth(INITIAL_ADMIN_AUTH);
     setToothNotationState(INITIAL_CLINIC_PROFILE.defaultToothNotation);
     
     localStorage.setItem(STORAGE_KEYS.CLINIC, JSON.stringify(INITIAL_CLINIC_PROFILE));
     localStorage.setItem(STORAGE_KEYS.PATIENTS, JSON.stringify(INITIAL_PATIENTS));
     localStorage.setItem(STORAGE_KEYS.PROCEDURES, JSON.stringify(INITIAL_PROCEDURES));
     localStorage.setItem(STORAGE_KEYS.INVOICES, JSON.stringify(INITIAL_INVOICES));
+    localStorage.setItem(STORAGE_KEYS.ADMIN_AUTH, JSON.stringify(INITIAL_ADMIN_AUTH));
     localStorage.setItem(STORAGE_KEYS.NOTATION, INITIAL_CLINIC_PROFILE.defaultToothNotation);
   };
 
   // Import JSON backup
-  const importDatabase = (data: { clinicProfile?: ClinicProfile; patients?: Patient[]; procedures?: DentalProcedure[]; invoices?: Invoice[] }): boolean => {
+  const importDatabase = (data: { clinicProfile?: ClinicProfile; patients?: Patient[]; procedures?: DentalProcedure[]; invoices?: Invoice[]; adminAuth?: AdminAuthConfig }): boolean => {
     try {
       if (data.clinicProfile) setClinicProfile(data.clinicProfile);
       if (data.patients && Array.isArray(data.patients)) setPatients(data.patients);
       if (data.procedures && Array.isArray(data.procedures)) setProcedures(data.procedures);
       if (data.invoices && Array.isArray(data.invoices)) setInvoices(data.invoices);
+      if (data.adminAuth) setAdminAuth(data.adminAuth);
       return true;
     } catch {
       return false;
@@ -343,7 +434,8 @@ export const DentalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       clinicProfile,
       patients,
       procedures,
-      invoices
+      invoices,
+      adminAuth
     };
   };
 
@@ -408,7 +500,14 @@ export const DentalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         stats,
         resetToDefaults,
         importDatabase,
-        exportDatabase
+        exportDatabase,
+        adminAuth,
+        updateAdminAuth,
+        isAuthenticated,
+        adminUser,
+        loginWithPin,
+        loginWithPassword,
+        logout
       }}
     >
       {children}

@@ -13,6 +13,22 @@ export type ProcedureCategory =
   | 'Pediatric'
   | 'Cosmetic';
 
+export interface AdminAuthConfig {
+  adminEmail: string;
+  adminPin: string;
+  adminPassword: string;
+  subdomainUrl: string;
+  autoLockTimeoutMinutes: number; // e.g. 15 mins (0 for disabled)
+  lastLoginAt?: string;
+}
+
+export interface AdminUser {
+  name: string;
+  email: string;
+  role: 'Lead Dentist & Practice Director' | 'Administrator' | 'Associate Dentist';
+  avatarInitials: string;
+}
+
 export interface ClinicProfile {
   name: string;
   tagline: string;
@@ -104,9 +120,9 @@ export interface PaymentTransaction {
   amount: number;
   date: string;
   method: PaymentMethod;
-  referenceNumber?: string; // UPI Ref, Card Auth Code, Cheque No
+  referenceNumber?: string;
+  receivedBy?: string;
   notes?: string;
-  receivedBy: string;
 }
 
 export interface Invoice {
@@ -115,8 +131,8 @@ export interface Invoice {
   patientId: string;
   patientName: string;
   patientPhone: string;
-  patientAge?: number;
-  patientGender?: string;
+  patientAge: number;
+  patientGender: string;
   patientAddress?: string;
   doctorName: string;
   date: string;
@@ -140,12 +156,12 @@ export interface Invoice {
 }
 
 export interface ToothInfo {
-  universal: number; // 1 - 32
-  fdi: number;       // 11 - 48
-  primaryFdi?: number; // 51 - 85
-  primaryUniversal?: string; // A - T
+  universal: number; // 1-32
+  fdi: number; // 11-48
+  primaryUniversal?: string; // A-T
+  primaryFdi?: number; // 51-85
   name: string;
-  quadrant: 'UR' | 'UL' | 'LL' | 'LR'; // Upper Right, Upper Left, Lower Left, Lower Right
+  quadrant: 'UR' | 'UL' | 'LL' | 'LR';
   arch: 'maxillary' | 'mandibular';
   isAnterior: boolean;
   isMolar: boolean;

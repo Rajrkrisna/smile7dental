@@ -1,4 +1,4 @@
-import type { ClinicProfile, DentalProcedure, Patient, ToothInfo, Invoice } from '../types';
+import type { ClinicProfile, DentalProcedure, Patient, ToothInfo, Invoice, AdminAuthConfig } from '../types';
 
 export const DENTAL_TEETH_MAP: ToothInfo[] = [
   // Upper Right Quadrant (Maxillary Right / UR) - Teeth 1 to 8 (Universal) / 18 to 11 (FDI)
@@ -100,6 +100,14 @@ export const INITIAL_CLINIC_PROFILE: ClinicProfile = {
     bankName: 'State Bank of India, Maduravoyal Branch',
     upiId: '9790862510@okaxis'
   }
+};
+
+export const INITIAL_ADMIN_AUTH: AdminAuthConfig = {
+  adminEmail: 'care@smile7dental.com',
+  adminPin: '7777',
+  adminPassword: 'Smile7@Admin2026',
+  subdomainUrl: 'billing.smile7dental.com',
+  autoLockTimeoutMinutes: 15
 };
 
 export const INITIAL_PROCEDURES: DentalProcedure[] = [

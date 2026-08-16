@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDental } from '../../context/DentalContext';
-import type { ClinicProfile, ToothNotation } from '../../types';
+import type { ClinicProfile, ToothNotation, AdminAuthConfig } from '../../types';
 import { exportToJSON } from '../../utils/printUtils';
 import { 
   Building2, 
@@ -8,7 +8,12 @@ import {
   Download, 
   Upload, 
   RotateCcw, 
-  CheckCircle2
+  CheckCircle2,
+  ShieldCheck,
+  Globe,
+  KeyRound,
+  Lock,
+  ExternalLink
 } from 'lucide-react';
 
 export const ClinicSettings: React.FC = () => {
@@ -18,15 +23,22 @@ export const ClinicSettings: React.FC = () => {
     resetToDefaults, 
     exportDatabase, 
     importDatabase, 
-    setToothNotation 
+    setToothNotation,
+    adminAuth,
+    updateAdminAuth
   } = useDental();
 
   const [formData, setFormData] = useState<ClinicProfile>({ ...clinicProfile });
+  const [authData, setAuthData] = useState<AdminAuthConfig>({ ...adminAuth });
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
   const [importStatus, setImportStatus] = useState<string>('');
 
   const handleChange = (field: keyof ClinicProfile, value: unknown) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleAuthChange = (field: keyof AdminAuthConfig, value: unknown) => {
+    setAuthData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleBankChange = (field: string, value: string) => {
@@ -46,6 +58,7 @@ export const ClinicSettings: React.FC = () => {
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     updateClinicProfile(formData);
+    updateAdminAuth(authData);
     setToothNotation(formData.defaultToothNotation);
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);
@@ -69,6 +82,7 @@ export const ClinicSettings: React.FC = () => {
         if (success) {
           setImportStatus('Backup restored successfully!');
           if (json.clinicProfile) setFormData(json.clinicProfile);
+          if (json.adminAuth) setAuthData(json.adminAuth);
         } else {
           setImportStatus('Failed to restore backup: Invalid format.');
         }
@@ -89,9 +103,9 @@ export const ClinicSettings: React.FC = () => {
             <Building2 className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-slate-900 tracking-tight">Clinic Profile & Practice Configuration</h1>
+            <h1 className="text-xl font-bold text-slate-900 tracking-tight">Practice & Subdomain Configuration</h1>
             <p className="text-xs text-slate-500">
-              Customize practice letterhead details, currency symbols, dental numbering, and system backups
+              Customize clinic letterhead details, Doctor security credentials, and subdomain deployment
             </p>
           </div>
         </div>
@@ -105,11 +119,113 @@ export const ClinicSettings: React.FC = () => {
       </div>
 
       <form onSubmit={handleSave} className="space-y-6">
-        {/* Practice Identity */}
+        {/* SECTION 1: Subdomain Deployment & Admin Security */}
+        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4 text-xs">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+            <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2 uppercase tracking-wide">
+              <ShieldCheck className="w-4 h-4 text-teal-600" />
+              1. Subdomain Access & Doctor Authentication Gate
+            </h2>
+            <span className="text-[10px] font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+              Admin Only Access
+            </span>
+          </div>
+
+          <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-600 space-y-1">
+            <p className="font-semibold text-slate-800 flex items-center gap-1.5">
+              <Globe className="w-4 h-4 text-teal-600" />
+              <span>Subdomain Deployment URL:</span>
+              <span className="font-mono text-teal-800 font-bold">{authData.subdomainUrl}</span>
+            </p>
+            <p className="text-[11px] text-slate-500">
+              Only authorized clinicians and staff with the Doctor PIN or Master Password can view patient ledgers, bills, or clinic financials on this subdomain.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="font-bold text-slate-700 block mb-1">
+                Subdomain Host URL
+              </label>
+              <div className="relative">
+                <Globe className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
+                <input
+                  type="text"
+                  required
+                  value={authData.subdomainUrl}
+                  onChange={(e) => handleAuthChange('subdomainUrl', e.target.value)}
+                  placeholder="billing.smile7dental.com"
+                  className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono font-semibold text-slate-900"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="font-bold text-slate-700 block mb-1">
+                Doctor Admin Email
+              </label>
+              <input
+                type="email"
+                required
+                value={authData.adminEmail}
+                onChange={(e) => handleAuthChange('adminEmail', e.target.value)}
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-medium"
+              />
+            </div>
+
+            <div>
+              <label className="font-bold text-slate-700 block mb-1 flex items-center gap-1">
+                <KeyRound className="w-3.5 h-3.5 text-teal-600" />
+                <span>Quick Doctor PIN (4 Digits)</span>
+              </label>
+              <input
+                type="text"
+                maxLength={6}
+                required
+                value={authData.adminPin}
+                onChange={(e) => handleAuthChange('adminPin', e.target.value)}
+                placeholder="7777"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-center text-base tracking-widest font-black text-slate-900"
+              />
+              <span className="text-[10px] text-slate-400 mt-1 block">Used for fast terminal unlocks at chairside.</span>
+            </div>
+
+            <div>
+              <label className="font-bold text-slate-700 block mb-1 flex items-center gap-1">
+                <Lock className="w-3.5 h-3.5 text-teal-600" />
+                <span>Master Admin Password</span>
+              </label>
+              <input
+                type="text"
+                required
+                value={authData.adminPassword}
+                onChange={(e) => handleAuthChange('adminPassword', e.target.value)}
+                placeholder="Smile7@Admin2026"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-slate-900 font-semibold"
+              />
+              <span className="text-[10px] text-slate-400 mt-1 block">Used for administrative credential recovery and backups.</span>
+            </div>
+          </div>
+
+          {/* DNS Configuration Instructions Helper */}
+          <div className="p-3 bg-teal-50/60 border border-teal-200 rounded-xl space-y-2 text-xs">
+            <span className="font-bold text-teal-900 flex items-center gap-1.5">
+              <ExternalLink className="w-3.5 h-3.5 text-teal-700" />
+              How to point billing.smile7dental.com to this application:
+            </span>
+            <ol className="list-decimal list-inside space-y-1 text-slate-600 text-[11px] leading-relaxed">
+              <li>Open your domain DNS manager (e.g. Cloudflare, GoDaddy, Hostinger, Namecheap).</li>
+              <li>Add a new <strong>CNAME Record</strong>: Host = <code className="bg-white px-1.5 py-0.5 rounded border border-teal-200 font-mono text-teal-800">billing</code>, Target = <code className="bg-white px-1.5 py-0.5 rounded border border-teal-200 font-mono text-teal-800">your-deployment-url (e.g. pmanickapriya.github.io or vercel.app)</code>.</li>
+              <li>Deploy this repository build (<code className="bg-white px-1.5 py-0.5 rounded border font-mono">npm run build</code>) to your host and enable custom domain <code className="font-mono text-teal-800">billing.smile7dental.com</code>.</li>
+            </ol>
+          </div>
+        </div>
+
+        {/* SECTION 2: Practice & Letterhead Details */}
         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4 text-xs">
           <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2 uppercase tracking-wide">
             <span className="w-2 h-2 rounded-full bg-teal-600"></span>
-            1. Practice & Letterhead Information
+            2. Practice & Letterhead Information
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -146,7 +262,7 @@ export const ClinicSettings: React.FC = () => {
             </div>
 
             <div>
-              <label className="font-bold text-slate-700 block mb-1">Tax ID / GSTIN / VAT Reg No.</label>
+              <label className="font-bold text-slate-700 block mb-1">Tax ID / GSTIN Reg No.</label>
               <input
                 type="text"
                 value={formData.taxId}
@@ -237,11 +353,11 @@ export const ClinicSettings: React.FC = () => {
           </div>
         </div>
 
-        {/* Currency, Tooth Notation & Billing Preferences */}
+        {/* SECTION 3: Currency, Tooth Notation & Billing Preferences */}
         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4 text-xs">
           <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2 uppercase tracking-wide">
             <span className="w-2 h-2 rounded-full bg-teal-600"></span>
-            2. Billing & Notation Preferences
+            3. Billing & Notation Preferences
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -252,7 +368,7 @@ export const ClinicSettings: React.FC = () => {
                 value={formData.currencySymbol}
                 onChange={(e) => handleChange('currencySymbol', e.target.value)}
                 className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-bold"
-                placeholder="$, ₹, £, €, AED"
+                placeholder="₹, $, £, €, AED"
               />
             </div>
 
@@ -291,11 +407,11 @@ export const ClinicSettings: React.FC = () => {
           </div>
         </div>
 
-        {/* Bank & Settlement Details */}
+        {/* SECTION 4: Bank & Settlement Details */}
         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4 text-xs">
           <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2 uppercase tracking-wide">
             <span className="w-2 h-2 rounded-full bg-teal-600"></span>
-            3. Bank Account & Digital QR Settlement
+            4. Bank Account & Digital UPI Settlement
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -330,7 +446,7 @@ export const ClinicSettings: React.FC = () => {
             </div>
 
             <div>
-              <label className="font-bold text-slate-700 block mb-1">IFSC / Routing / Swift Code</label>
+              <label className="font-bold text-slate-700 block mb-1">IFSC / Branch Code</label>
               <input
                 type="text"
                 value={formData.bankDetails?.ifscOrRouting || ''}
@@ -340,10 +456,10 @@ export const ClinicSettings: React.FC = () => {
             </div>
 
             <div className="sm:col-span-2">
-              <label className="font-bold text-slate-700 block mb-1">UPI ID / Digital QR Handle</label>
+              <label className="font-bold text-slate-700 block mb-1">UPI ID / QR Handle</label>
               <input
                 type="text"
-                placeholder="smile7dental@upi"
+                placeholder="9790862510@okaxis"
                 value={formData.bankDetails?.upiId || ''}
                 onChange={(e) => handleBankChange('upiId', e.target.value)}
                 className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-teal-800 font-semibold"
@@ -359,7 +475,7 @@ export const ClinicSettings: React.FC = () => {
             className="px-6 py-2.5 text-sm font-bold text-white bg-teal-600 hover:bg-teal-700 active:bg-teal-800 rounded-xl shadow-md shadow-teal-600/20 transition-all flex items-center gap-2"
           >
             <Save className="w-4 h-4" />
-            Save Clinic Settings
+            Save Practice & Security Settings
           </button>
         </div>
       </form>
@@ -410,6 +526,7 @@ export const ClinicSettings: React.FC = () => {
               if (window.confirm('Reset all patients, procedures, and invoices to initial demo data? This will overwrite existing records.')) {
                 resetToDefaults();
                 setFormData(clinicProfile);
+                setAuthData(adminAuth);
                 alert('Database reset to defaults.');
               }
             }}

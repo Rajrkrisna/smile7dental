@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DentalProvider } from './context/DentalContext';
+import { DentalProvider, useDental } from './context/DentalContext';
 import { Navbar } from './components/layout/Navbar';
 import { Sidebar } from './components/layout/Sidebar';
 import { ClinicDashboard } from './components/dashboard/ClinicDashboard';
@@ -12,8 +12,10 @@ import { AddPatientModal } from './components/patients/AddPatientModal';
 import { TreatmentCatalog } from './components/treatments/TreatmentCatalog';
 import { PaymentHistory } from './components/payments/PaymentHistory';
 import { ClinicSettings } from './components/settings/ClinicSettings';
+import { AdminLogin } from './components/auth/AdminLogin';
 
 const DentalAppContent: React.FC = () => {
+  const { isAuthenticated } = useDental();
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   
   // Modals & Sub-views State
@@ -45,6 +47,11 @@ const DentalAppContent: React.FC = () => {
     setViewInvoiceId(invoiceId);
     setInvoicePrintMode('thermal');
   };
+
+  // If unauthorized, show Admin security portal
+  if (!isAuthenticated) {
+    return <AdminLogin onLoginSuccess={() => setActiveTab('dashboard')} />;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
