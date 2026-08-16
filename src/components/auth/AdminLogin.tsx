@@ -10,6 +10,8 @@ import {
   Globe,
   Stethoscope
 } from 'lucide-react';
+import logoIcon from '../../assets/smile7-logo-icon.png';
+import logoText from '../../assets/smile7-logo-text.jpg';
 
 interface AdminLoginProps {
   onLoginSuccess: () => void;
@@ -98,18 +100,21 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
       {/* Top Header Bar */}
       <header className="relative z-10 p-5 sm:p-6 flex flex-wrap items-center justify-between gap-4 border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-md">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-linear-to-br from-teal-500 to-teal-700 text-white rounded-xl flex items-center justify-center font-black text-lg shadow-lg shadow-teal-900/40">
-            S7
+          <div className="bg-white p-1.5 rounded-xl flex items-center gap-2 shadow-md">
+            <img 
+              src={logoIcon} 
+              alt="Smile7 Logo Icon" 
+              className="h-8 w-auto object-contain"
+            />
+            <img 
+              src={logoText} 
+              alt="Smile7 Dental Clinic" 
+              className="h-6 w-auto object-contain"
+            />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-black text-white text-base tracking-tight">Smile7 Dental Clinic</span>
-              <span className="bg-teal-500/20 text-teal-300 border border-teal-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full">
-                Admin Restricted
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-400">Practice Management & Billing Subdomain</p>
-          </div>
+          <span className="bg-teal-500/20 text-teal-300 border border-teal-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full">
+            Admin Restricted
+          </span>
         </div>
 
         {/* Subdomain Indicator */}
@@ -124,15 +129,27 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
       <main className="relative z-10 flex-1 flex items-center justify-center p-4 sm:p-6 my-auto">
         <div className="w-full max-w-md bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-black/80 space-y-6">
           
-          {/* Practice Badge & Lead Doctor */}
-          <div className="text-center space-y-2">
-            <div className="w-14 h-14 bg-teal-500/10 border border-teal-500/30 text-teal-400 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
-              <ShieldCheck className="w-7 h-7" />
+          {/* Official Clinic Logo Centerpiece */}
+          <div className="text-center space-y-3">
+            <div className="bg-white/95 p-3 rounded-2xl inline-flex items-center justify-center gap-2.5 shadow-lg border border-white/20 mx-auto">
+              <img 
+                src={logoIcon} 
+                alt="Smile7 Icon" 
+                className="h-10 w-auto object-contain"
+              />
+              <img 
+                src={logoText} 
+                alt="Smile7 Dental Clinic" 
+                className="h-8 w-auto object-contain"
+              />
             </div>
             
-            <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-              Clinician Authentication
-            </h1>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                Clinician Authentication
+              </h1>
+              <p className="text-xs text-slate-400 mt-0.5">Authorized Practice Billing & Records Gate</p>
+            </div>
             
             <div className="inline-flex items-center gap-1.5 bg-slate-800/80 border border-slate-700/60 px-3 py-1 rounded-full text-xs text-slate-300">
               <Stethoscope className="w-3.5 h-3.5 text-teal-400" />
@@ -215,7 +232,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
                     key={digit}
                     type="button"
                     onClick={() => handlePinDigit(digit)}
-                    className="h-12 bg-slate-800/80 hover:bg-slate-700 active:bg-teal-600 active:text-white rounded-xl text-lg font-bold text-slate-100 border border-slate-700/50 transition-all"
+                    className="h-12 bg-slate-800/80 hover:bg-slate-700 active:bg-teal-600 active:text-white rounded-xl text-lg font-bold text-slate-100 border border-slate-700/50 transition-all cursor-pointer"
                   >
                     {digit}
                   </button>
@@ -224,7 +241,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
                 <button
                   type="button"
                   onClick={handlePinClear}
-                  className="h-12 bg-slate-950 hover:bg-slate-800 text-slate-400 rounded-xl text-xs font-bold border border-slate-800 transition-all"
+                  className="h-12 bg-slate-950 hover:bg-slate-800 text-slate-400 rounded-xl text-xs font-bold border border-slate-800 transition-all cursor-pointer"
                 >
                   Clear
                 </button>
@@ -232,7 +249,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
                 <button
                   type="button"
                   onClick={() => handlePinDigit('0')}
-                  className="h-12 bg-slate-800/80 hover:bg-slate-700 active:bg-teal-600 active:text-white rounded-xl text-lg font-bold text-slate-100 border border-slate-700/50 transition-all"
+                  className="h-12 bg-slate-800/80 hover:bg-slate-700 active:bg-teal-600 active:text-white rounded-xl text-lg font-bold text-slate-100 border border-slate-700/50 transition-all cursor-pointer"
                 >
                   0
                 </button>
@@ -240,7 +257,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
                 <button
                   type="button"
                   onClick={handlePinBackspace}
-                  className="h-12 bg-slate-950 hover:bg-slate-800 text-slate-400 rounded-xl text-xs font-bold border border-slate-800 transition-all"
+                  className="h-12 bg-slate-950 hover:bg-slate-800 text-slate-400 rounded-xl text-xs font-bold border border-slate-800 transition-all cursor-pointer"
                 >
                   ⌫
                 </button>
@@ -250,7 +267,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
               <button
                 type="button"
                 onClick={handlePinSubmit}
-                className="w-full py-3 bg-linear-to-r from-teal-600 to-teal-700 hover:from-teal-500 hover:to-teal-600 text-white font-bold rounded-xl shadow-lg shadow-teal-900/30 flex items-center justify-center gap-2 text-sm transition-all"
+                className="w-full py-3 bg-linear-to-r from-teal-600 to-teal-700 hover:from-teal-500 hover:to-teal-600 text-white font-bold rounded-xl shadow-lg shadow-teal-900/30 flex items-center justify-center gap-2 text-sm transition-all cursor-pointer"
               >
                 <span>Unlock Billing Terminal</span>
                 <ArrowRight className="w-4 h-4" />
@@ -295,7 +312,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
 
               <button
                 type="submit"
-                className="w-full py-3 bg-linear-to-r from-teal-600 to-teal-700 hover:from-teal-500 hover:to-teal-600 text-white font-bold rounded-xl shadow-lg shadow-teal-900/30 flex items-center justify-center gap-2 text-sm transition-all"
+                className="w-full py-3 bg-linear-to-r from-teal-600 to-teal-700 hover:from-teal-500 hover:to-teal-600 text-white font-bold rounded-xl shadow-lg shadow-teal-900/30 flex items-center justify-center gap-2 text-sm transition-all cursor-pointer"
               >
                 <span>Sign In to Admin Console</span>
                 <ArrowRight className="w-4 h-4" />
@@ -312,7 +329,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
           {/* Clinical Privacy Notice */}
           <div className="pt-4 border-t border-slate-800/80 text-[11px] text-slate-500 text-center space-y-1">
             <p className="flex items-center justify-center gap-1">
-              <Lock className="w-3 h-3 text-teal-500" />
+              <ShieldCheck className="w-3 h-3 text-teal-500" />
               <span>Restricted Access: Patient Financial & Medical Records</span>
             </p>
             <p className="text-[10px] text-slate-600">

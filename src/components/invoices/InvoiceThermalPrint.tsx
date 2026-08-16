@@ -2,6 +2,8 @@ import React from 'react';
 import type { Invoice, ClinicProfile } from '../../types';
 import { formatCurrency, formatDate, formatDateTime } from '../../utils/formatters';
 
+import logoIcon from '../../assets/smile7-logo-icon.png';
+
 interface InvoiceThermalPrintProps {
   invoice: Invoice;
   clinic: ClinicProfile;
@@ -12,6 +14,11 @@ export const InvoiceThermalPrint: React.FC<InvoiceThermalPrintProps> = ({ invoic
     <div id="invoice-thermal-printable" className="thermal-print-container bg-white text-black font-mono text-[11px] leading-tight p-4 max-w-[80mm] mx-auto border border-dashed border-slate-300">
       {/* Clinic Header */}
       <div className="text-center pb-2 border-b border-black">
+        <img 
+          src={logoIcon} 
+          alt="Smile7 Logo" 
+          className="w-8 h-8 object-contain mx-auto mb-1 grayscale contrast-200" 
+        />
         <p className="text-base font-bold uppercase tracking-tight">{clinic.name}</p>
         <p className="text-[10px]">{clinic.addressLine1}</p>
         <p className="text-[10px]">{clinic.city}, {clinic.state} {clinic.zipCode}</p>

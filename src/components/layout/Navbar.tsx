@@ -1,6 +1,7 @@
 import React from 'react';
 import { useDental } from '../../context/DentalContext';
 import { Plus, Lock, Globe, ShieldCheck } from 'lucide-react';
+import logoIcon from '../../assets/smile7-logo-icon.png';
 
 interface NavbarProps {
   onOpenCreateInvoice: () => void;
@@ -20,10 +21,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCreateInvoice }) => {
   return (
     <header className="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-6 py-3 transition-all">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-        {/* Clinic Branding */}
+        {/* Clinic Branding with Official Logo */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-linear-to-br from-teal-600 to-teal-800 text-white rounded-xl flex items-center justify-center font-black text-xl shadow-md shadow-teal-700/20 tracking-wider">
-            S7
+          <div className="w-10 h-10 bg-white border border-slate-200 rounded-xl p-1 flex items-center justify-center shadow-xs overflow-hidden">
+            <img 
+              src={logoIcon} 
+              alt="Smile7 Dental Clinic Logo" 
+              className="w-full h-full object-contain"
+              onError={(e) => {
+                // Fallback to text initials if image load fails
+                (e.target as HTMLElement).style.display = 'none';
+              }}
+            />
           </div>
           <div>
             <div className="flex items-center gap-2">

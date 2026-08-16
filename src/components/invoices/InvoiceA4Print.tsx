@@ -2,6 +2,9 @@ import React from 'react';
 import type { Invoice, ClinicProfile } from '../../types';
 import { formatCurrency, formatDate, formatDateTime } from '../../utils/formatters';
 
+import logoIcon from '../../assets/smile7-logo-icon.png';
+import logoText from '../../assets/smile7-logo-text.jpg';
+
 interface InvoiceA4PrintProps {
   invoice: Invoice;
   clinic: ClinicProfile;
@@ -14,14 +17,18 @@ export const InvoiceA4Print: React.FC<InvoiceA4PrintProps> = ({ invoice, clinic 
       <div className="border-b-2 border-teal-700 pb-5 mb-6">
         <div className="flex justify-between items-start">
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="w-9 h-9 bg-teal-700 text-white rounded-lg flex items-center justify-center font-black text-xl tracking-wider">
-                S7
-              </span>
+            <div className="flex items-center gap-3">
+              <img 
+                src={logoIcon} 
+                alt="Smile7 Logo Icon" 
+                className="h-12 w-auto object-contain"
+              />
               <div>
-                <h1 className="text-2xl font-black tracking-tight text-teal-900 leading-tight">
-                  {clinic.name}
-                </h1>
+                <img 
+                  src={logoText} 
+                  alt="Smile7 Dental Clinic" 
+                  className="h-7 w-auto object-contain mb-0.5"
+                />
                 <p className="text-xs font-semibold text-teal-700 uppercase tracking-wider">
                   {clinic.tagline}
                 </p>
