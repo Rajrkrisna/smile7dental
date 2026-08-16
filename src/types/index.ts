@@ -19,7 +19,10 @@ export interface AdminAuthConfig {
   adminPassword: string;
   subdomainUrl: string;
   autoLockTimeoutMinutes: number; // e.g. 15 mins (0 for disabled)
+  isConfigured?: boolean;
   lastLoginAt?: string;
+  failedAttempts?: number;
+  lockedUntil?: string;
 }
 
 export interface AdminUser {

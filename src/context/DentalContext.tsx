@@ -58,6 +58,7 @@ interface DentalContextType {
   // Admin Auth State & Controls
   adminAuth: AdminAuthConfig;
   updateAdminAuth: (config: Partial<AdminAuthConfig>) => void;
+  setupMasterCredentials: (password: string, pin: string, email?: string) => void;
   isAuthenticated: boolean;
   adminUser: AdminUser | null;
   loginWithPin: (pin: string) => boolean;
@@ -202,8 +203,28 @@ export const DentalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, [activeToothNotation]);
 
   // Auth Operations
+  const setupMasterCredentials = (password: string, pin: string, email?: string) => {
+    const updated: AdminAuthConfig = {
+      ...adminAuth,
+      adminPassword: password,
+      adminPin: pin,
+      adminEmail: email || adminAuth.adminEmail || 'care@smile7dental.com',
+      isConfigured: true
+    };
+    setAdminAuth(updated);
+    localStorage.setItem(STORAGE_KEYS.ADMIN_AUTH, JSON.stringify(updated));
+    setIsAuthenticated(true);
+    setAdminUser({
+      name: 'Dr. P. Manickapriya',
+      email: updated.adminEmail,
+      role: 'Lead Dentist & Practice Director',
+      avatarInitials: 'PM'
+    });
+    sessionStorage.setItem(STORAGE_KEYS.AUTH_SESSION, 'authenticated');
+  };
+
   const loginWithPin = (pin: string): boolean => {
-    if (pin.trim() === adminAuth.adminPin) {
+    if (adminAuth.adminPin && pin.trim() === adminAuth.adminPin) {
       setIsAuthenticated(true);
       setAdminUser({
         name: 'Dr. P. Manickapriya',
@@ -218,7 +239,7 @@ export const DentalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const loginWithPassword = (password: string): boolean => {
-    if (password === adminAuth.adminPassword) {
+    if (adminAuth.adminPassword && password === adminAuth.adminPassword) {
       setIsAuthenticated(true);
       setAdminUser({
         name: 'Dr. P. Manickapriya',
@@ -239,7 +260,11 @@ export const DentalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const updateAdminAuth = (configUpdates: Partial<AdminAuthConfig>) => {
-    setAdminAuth(prev => ({ ...prev, ...configUpdates }));
+    setAdminAuth(prev => {
+      const next = { ...prev, ...configUpdates, isConfigured: true };
+      localStorage.setItem(STORAGE_KEYS.ADMIN_AUTH, JSON.stringify(next));
+      return next;
+    });
   };
 
   const setToothNotation = (notation: ToothNotation) => {
@@ -503,6 +528,7 @@ export const DentalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         exportDatabase,
         adminAuth,
         updateAdminAuth,
+        setupMasterCredentials,
         isAuthenticated,
         adminUser,
         loginWithPin,

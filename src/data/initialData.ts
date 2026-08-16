@@ -104,10 +104,11 @@ export const INITIAL_CLINIC_PROFILE: ClinicProfile = {
 
 export const INITIAL_ADMIN_AUTH: AdminAuthConfig = {
   adminEmail: 'care@smile7dental.com',
-  adminPin: '7777',
-  adminPassword: 'Smile7@Admin2026',
+  adminPin: '',
+  adminPassword: '',
   subdomainUrl: 'billing.smile7dental.com',
-  autoLockTimeoutMinutes: 15
+  autoLockTimeoutMinutes: 15,
+  isConfigured: false
 };
 
 export const INITIAL_PROCEDURES: DentalProcedure[] = [

@@ -13,7 +13,9 @@ import {
   Globe,
   KeyRound,
   Lock,
-  ExternalLink
+  ExternalLink,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 export const ClinicSettings: React.FC = () => {
@@ -30,6 +32,8 @@ export const ClinicSettings: React.FC = () => {
 
   const [formData, setFormData] = useState<ClinicProfile>({ ...clinicProfile });
   const [authData, setAuthData] = useState<AdminAuthConfig>({ ...adminAuth });
+  const [showPin, setShowPin] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
   const [importStatus, setImportStatus] = useState<string>('');
 
@@ -178,16 +182,25 @@ export const ClinicSettings: React.FC = () => {
                 <KeyRound className="w-3.5 h-3.5 text-teal-600" />
                 <span>Quick Doctor PIN (4 Digits)</span>
               </label>
-              <input
-                type="text"
-                maxLength={6}
-                required
-                value={authData.adminPin}
-                onChange={(e) => handleAuthChange('adminPin', e.target.value)}
-                placeholder="7777"
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-center text-base tracking-widest font-black text-slate-900"
-              />
-              <span className="text-[10px] text-slate-400 mt-1 block">Used for fast terminal unlocks at chairside.</span>
+              <div className="relative">
+                <input
+                  type={showPin ? 'text' : 'password'}
+                  maxLength={4}
+                  required
+                  value={authData.adminPin}
+                  onChange={(e) => handleAuthChange('adminPin', e.target.value.replace(/\D/g, ''))}
+                  placeholder="4-digit PIN"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-center text-base tracking-widest font-black text-slate-900 pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPin(!showPin)}
+                  className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 cursor-pointer"
+                >
+                  {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              <span className="text-[10px] text-slate-400 mt-1 block">Used for fast chairside unlocks.</span>
             </div>
 
             <div>
@@ -195,15 +208,24 @@ export const ClinicSettings: React.FC = () => {
                 <Lock className="w-3.5 h-3.5 text-teal-600" />
                 <span>Master Admin Password</span>
               </label>
-              <input
-                type="text"
-                required
-                value={authData.adminPassword}
-                onChange={(e) => handleAuthChange('adminPassword', e.target.value)}
-                placeholder="Smile7@Admin2026"
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-slate-900 font-semibold"
-              />
-              <span className="text-[10px] text-slate-400 mt-1 block">Used for administrative credential recovery and backups.</span>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={authData.adminPassword}
+                  onChange={(e) => handleAuthChange('adminPassword', e.target.value)}
+                  placeholder="Enter private master password"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-mono text-slate-900 font-semibold pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 cursor-pointer"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              <span className="text-[10px] text-slate-400 mt-1 block">Only you can set or change this password.</span>
             </div>
           </div>
 
