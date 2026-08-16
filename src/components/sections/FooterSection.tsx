@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Phone, Mail, Clock, ShieldCheck, ExternalLink, Navigation, Lock } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, ShieldCheck, ExternalLink, Navigation } from 'lucide-react';
 import logoText from '../../assets/logo-text.jpg';
 import logoIcon from '../../assets/logo-icon.png';
 
@@ -104,20 +104,15 @@ export const FooterSection: React.FC<FooterSectionProps> = ({ onOpenBillingPorta
 
       {/* Bottom Bar */}
       <div className="max-w-7xl mx-auto border-t border-slate-800 mt-16 pt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 gap-4">
-        <div>
+        <div 
+          onClick={onOpenBillingPortal}
+          className="select-none"
+          title=""
+        >
           &copy; {new Date().getFullYear()} Smile7 Dental Clinic. Dr. P. Manickapriya (BDS, FCD &bull; DCI Reg No: 26448). All Rights Reserved.
         </div>
-        <div className="flex items-center gap-4 text-slate-500">
-          <span>Precision Clinical Excellence &bull; Patient Care Sanctuary</span>
-          {onOpenBillingPortal && (
-            <button
-              onClick={onOpenBillingPortal}
-              className="inline-flex items-center gap-1 text-slate-400 hover:text-sky-400 font-semibold transition-colors cursor-pointer"
-            >
-              <Lock className="w-3 h-3 text-sky-500" />
-              <span>Doctor / Staff Portal</span>
-            </button>
-          )}
+        <div className="text-slate-500">
+          Precision Clinical Excellence &bull; Patient Care Sanctuary
         </div>
       </div>
     </footer>

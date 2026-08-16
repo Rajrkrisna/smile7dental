@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Phone, Calendar, Menu, X, ShieldCheck } from 'lucide-react';
+import { Phone, Calendar, Menu, X } from 'lucide-react';
 import logoText from '../../assets/logo-text.jpg';
 import logoIcon from '../../assets/logo-icon.png';
 
 interface NavbarProps {
   onOpenBooking: () => void;
-  onOpenBillingPortal?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking, onOpenBillingPortal }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -61,7 +60,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking, onOpenBillingPort
         </nav>
 
         {/* Contact & Visible High-Contrast CTA Button */}
-        <div className="hidden md:flex items-center gap-3 shrink-0">
+        <div className="hidden md:flex items-center gap-4 shrink-0">
           <a
             href="tel:+919790862510"
             className="hidden lg:flex items-center gap-2 text-xs font-bold text-navy-700 hover:text-sky-600 transition-colors"
@@ -71,17 +70,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking, onOpenBillingPort
             </div>
             <span className="whitespace-nowrap">+91 97908 62510</span>
           </a>
-
-          {onOpenBillingPortal && (
-            <button
-              onClick={onOpenBillingPortal}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all border border-slate-200 shadow-xs whitespace-nowrap cursor-pointer"
-              title="Doctor & Staff Billing & Practice Management Suite"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-[#004884]" />
-              <span>Billing Suite</span>
-            </button>
-          )}
 
           <button
             onClick={onOpenBooking}
@@ -156,18 +144,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenBooking, onOpenBillingPort
           >
             Book Appointment
           </button>
-          {onOpenBillingPortal && (
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenBillingPortal();
-              }}
-              className="w-full py-3 rounded-full bg-slate-100 text-slate-700 text-xs font-bold uppercase tracking-wider border border-slate-200 flex items-center justify-center gap-2"
-            >
-              <ShieldCheck className="w-4 h-4 text-[#004884]" />
-              <span>Doctor / Staff Billing Portal</span>
-            </button>
-          )}
         </div>
       )}
     </header>
