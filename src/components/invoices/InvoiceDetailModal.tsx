@@ -3,8 +3,10 @@ import { useDental } from '../../context/DentalContext';
 import type { PaymentMethod } from '../../types';
 import { formatCurrency, formatDate, formatDateTime } from '../../utils/formatters';
 import { triggerPrint } from '../../utils/printUtils';
+import { sendWhatsAppInvoice, sendEmailInvoice } from '../../utils/shareUtils';
 import { InvoiceA4Print } from './InvoiceA4Print';
 import { InvoiceThermalPrint } from './InvoiceThermalPrint';
+import { ShareInvoiceModal } from './ShareInvoiceModal';
 import confetti from 'canvas-confetti';
 import { 
   X, 
@@ -12,7 +14,10 @@ import {
   FileText, 
   User, 
   Stethoscope, 
-  Plus 
+  Plus,
+  Share2,
+  Mail,
+  MessageSquare
 } from 'lucide-react';
 
 interface InvoiceDetailModalProps {
@@ -26,12 +31,15 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({
   initialPrintMode = 'none',
   onClose
 }) => {
-  const { getInvoiceById, clinicProfile, recordPayment } = useDental();
+  const { getInvoiceById, clinicProfile, recordPayment, getPatientById } = useDental();
   const invoice = getInvoiceById(invoiceId);
+  const patient = invoice ? getPatientById(invoice.patientId) : undefined;
 
   const [activeTab, setActiveTab] = useState<'details' | 'a4' | 'thermal'>(
     initialPrintMode === 'a4' ? 'a4' : initialPrintMode === 'thermal' ? 'thermal' : 'details'
   );
+
+  const [showShareModal, setShowShareModal] = useState<boolean>(false);
 
   // Payment Recording Drawer State
   const [showRecordPayment, setShowRecordPayment] = useState<boolean>(false);
@@ -79,6 +87,14 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({
     triggerPrint('invoice-thermal-printable');
   };
 
+  const handleQuickWhatsApp = () => {
+    sendWhatsAppInvoice(invoice, clinicProfile, invoice.patientPhone);
+  };
+
+  const handleQuickEmail = () => {
+    sendEmailInvoice(invoice, clinicProfile, patient?.email);
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
       <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-5xl max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
@@ -108,42 +124,76 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({
             </div>
           </div>
 
-          {/* View Mode Switcher */}
-          <div className="flex items-center gap-2">
+          {/* Action Hub: WhatsApp, Email, Print Mode Switcher */}
+          <div className="flex flex-wrap items-center gap-2">
+            
+            {/* Direct WhatsApp button */}
+            <button
+              type="button"
+              onClick={handleQuickWhatsApp}
+              className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="Send invoice via WhatsApp"
+            >
+              <MessageSquare className="w-3.5 h-3.5" />
+              <span>WhatsApp</span>
+            </button>
+
+            {/* Direct Email button */}
+            <button
+              type="button"
+              onClick={handleQuickEmail}
+              className="px-3 py-1.5 bg-teal-700 hover:bg-teal-800 text-white rounded-xl text-xs font-bold shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="Send invoice via Email"
+            >
+              <Mail className="w-3.5 h-3.5" />
+              <span>Email</span>
+            </button>
+
+            {/* Custom Share Modal opener */}
+            <button
+              type="button"
+              onClick={() => setShowShareModal(true)}
+              className="p-2 text-slate-600 hover:text-slate-900 bg-slate-200/80 hover:bg-slate-200 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+              title="Share / Customize message"
+            >
+              <Share2 className="w-4 h-4" />
+            </button>
+
+            {/* View Mode Switcher */}
             <div className="flex bg-slate-200/80 p-0.5 rounded-xl text-xs font-semibold">
               <button
                 type="button"
                 onClick={() => setActiveTab('details')}
-                className={`px-3 py-1.5 rounded-lg transition-colors ${
+                className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
                   activeTab === 'details' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                Interactive Details
+                Details
               </button>
               <button
                 type="button"
                 onClick={() => setActiveTab('a4')}
-                className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 ${
+                className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 cursor-pointer ${
                   activeTab === 'a4' ? 'bg-white text-teal-800 shadow-xs' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                <Printer className="w-3.5 h-3.5" /> A4 Invoice
+                <Printer className="w-3.5 h-3.5" /> A4 Bill
               </button>
               <button
                 type="button"
                 onClick={() => setActiveTab('thermal')}
-                className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 ${
+                className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 cursor-pointer ${
                   activeTab === 'thermal' ? 'bg-white text-teal-800 shadow-xs' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                <FileText className="w-3.5 h-3.5" /> Thermal Slip
+                <FileText className="w-3.5 h-3.5" /> Slip
               </button>
             </div>
 
             <button
               type="button"
               onClick={onClose}
-              className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded-xl transition-colors"
+              className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -155,6 +205,42 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({
           {/* TAB 1: Interactive Details */}
           {activeTab === 'details' && (
             <div className="space-y-6 max-w-4xl mx-auto">
+              
+              {/* WhatsApp & Email Quick Banner */}
+              <div className="bg-linear-to-r from-emerald-50 via-teal-50 to-blue-50 p-4 rounded-2xl border border-emerald-200/80 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-emerald-600 text-white rounded-xl flex items-center justify-center font-bold shrink-0">
+                    <MessageSquare className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-slate-900">Dispatch Invoice to Patient</p>
+                    <p className="text-slate-500 text-[11px]">
+                      Send instant itemized receipt & payment link to {invoice.patientPhone}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleQuickWhatsApp}
+                    className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    <span>Send WhatsApp</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleQuickEmail}
+                    className="px-3.5 py-1.5 bg-teal-700 hover:bg-teal-800 text-white rounded-xl font-bold flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                  >
+                    <Mail className="w-3.5 h-3.5" />
+                    <span>Send Email</span>
+                  </button>
+                </div>
+              </div>
+
               {/* Top Banner with Financial Highlights */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
@@ -320,7 +406,7 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({
                         setPayAmount(invoice.balanceDue);
                         setShowRecordPayment(true);
                       }}
-                      className="px-3.5 py-1.5 text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-xl shadow-xs flex items-center gap-1.5 transition-colors"
+                      className="px-3.5 py-1.5 text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-xl shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       Record Settlement / Payment
@@ -336,7 +422,7 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({
                       <button
                         type="button"
                         onClick={() => setShowRecordPayment(false)}
-                        className="text-slate-400 hover:text-slate-600 font-bold"
+                        className="text-slate-400 hover:text-slate-600 font-bold cursor-pointer"
                       >
                         Cancel
                       </button>
@@ -365,9 +451,9 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({
                           onChange={(e) => setPayMethod(e.target.value as PaymentMethod)}
                           className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-800 font-medium"
                         >
+                          <option value="upi">UPI / QR Code</option>
                           <option value="card">Credit/Debit Card</option>
                           <option value="cash">Cash</option>
-                          <option value="upi">UPI / QR Code</option>
                           <option value="insurance">Insurance Direct</option>
                           <option value="bank_transfer">Bank Wire</option>
                           <option value="other">Other</option>
@@ -378,7 +464,7 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({
                         <label className="font-semibold text-slate-700 block mb-1">Ref / Auth Number</label>
                         <input
                           type="text"
-                          placeholder="e.g. TXN-88492"
+                          placeholder="e.g. UPI-998342 / TXN"
                           value={payRefNumber}
                           onChange={(e) => setPayRefNumber(e.target.value)}
                           className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-slate-800"
@@ -390,13 +476,13 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({
                       <button
                         type="button"
                         onClick={() => setShowRecordPayment(false)}
-                        className="px-3 py-1.5 text-xs text-slate-600 bg-white border border-slate-200 rounded-lg"
+                        className="px-3 py-1.5 text-xs text-slate-600 bg-white border border-slate-200 rounded-lg cursor-pointer"
                       >
                         Close
                       </button>
                       <button
                         type="submit"
-                        className="px-4 py-1.5 text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-lg shadow-xs"
+                        className="px-4 py-1.5 text-xs font-bold text-white bg-teal-600 hover:bg-teal-700 rounded-lg shadow-xs cursor-pointer"
                       >
                         Confirm Receipt
                       </button>
@@ -435,8 +521,15 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({
               <div className="flex justify-end gap-2 max-w-[210mm] mx-auto">
                 <button
                   type="button"
+                  onClick={handleQuickWhatsApp}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md flex items-center gap-2 cursor-pointer"
+                >
+                  <MessageSquare className="w-4 h-4" /> Send via WhatsApp
+                </button>
+                <button
+                  type="button"
                   onClick={handlePrintA4}
-                  className="px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold rounded-xl shadow-md flex items-center gap-2"
+                  className="px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold rounded-xl shadow-md flex items-center gap-2 cursor-pointer"
                 >
                   <Printer className="w-4 h-4" /> Print / Save as PDF
                 </button>
@@ -454,7 +547,7 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({
                 <button
                   type="button"
                   onClick={handlePrintThermal}
-                  className="px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold rounded-xl shadow-md flex items-center gap-2"
+                  className="px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold rounded-xl shadow-md flex items-center gap-2 cursor-pointer"
                 >
                   <Printer className="w-4 h-4" /> Print Thermal Slip
                 </button>
@@ -476,13 +569,21 @@ export const InvoiceDetailModal: React.FC<InvoiceDetailModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-xl transition-colors"
+              className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-xl transition-colors cursor-pointer"
             >
               Close Window
             </button>
           </div>
         </div>
       </div>
+
+      {/* Share / Dispatch Submodal */}
+      {showShareModal && (
+        <ShareInvoiceModal
+          invoiceId={invoice.id}
+          onClose={() => setShowShareModal(false)}
+        />
+      )}
     </div>
   );
 };

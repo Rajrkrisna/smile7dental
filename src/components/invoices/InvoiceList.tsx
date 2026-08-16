@@ -3,6 +3,8 @@ import { useDental } from '../../context/DentalContext';
 import type { PaymentStatus } from '../../types';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { exportToCSV } from '../../utils/printUtils';
+import { sendWhatsAppInvoice } from '../../utils/shareUtils';
+import { ShareInvoiceModal } from './ShareInvoiceModal';
 import { 
   Search, 
   Filter, 
@@ -12,7 +14,9 @@ import {
   Eye, 
   Printer, 
   Trash2, 
-  Calendar
+  Calendar,
+  MessageSquare,
+  Share2
 } from 'lucide-react';
 
 interface InvoiceListProps {
@@ -32,99 +36,99 @@ export const InvoiceList: React.FC<InvoiceListProps> = ({
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [dateFilter, setDateFilter] = useState<string>('all'); // all, today, thisMonth, thisYear
+  const [shareInvoiceId, setShareInvoiceId] = useState<string | null>(null);
 
   const todayStr = new Date().toISOString().split('T')[0];
   const thisMonthStr = todayStr.substring(0, 7);
   const thisYearStr = todayStr.substring(0, 4);
 
   const filteredInvoices = invoices.filter(inv => {
-    // Search match
+    // Text search
     const matchesSearch = 
       inv.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       inv.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       inv.patientPhone.includes(searchTerm) ||
-      (inv.doctorName && inv.doctorName.toLowerCase().includes(searchTerm.toLowerCase()));
+      inv.items.some(i => i.procedureName.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    if (!matchesSearch) return false;
 
     // Status filter
-    const matchesStatus = statusFilter === 'all' || inv.status === statusFilter;
-
-    // Date filter
-    let matchesDate = true;
-    if (dateFilter === 'today') {
-      matchesDate = inv.date === todayStr;
-    } else if (dateFilter === 'thisMonth') {
-      matchesDate = inv.date.startsWith(thisMonthStr);
-    } else if (dateFilter === 'thisYear') {
-      matchesDate = inv.date.startsWith(thisYearStr);
+    if (statusFilter !== 'all' && inv.status !== statusFilter) {
+      return false;
     }
 
-    return matchesSearch && matchesStatus && matchesDate;
-  });
+    // Date filter
+    if (dateFilter === 'today') {
+      return inv.date.startsWith(todayStr);
+    } else if (dateFilter === 'thisMonth') {
+      return inv.date.startsWith(thisMonthStr);
+    } else if (dateFilter === 'thisYear') {
+      return inv.date.startsWith(thisYearStr);
+    }
 
-  const handleExportCSV = () => {
-    const data = filteredInvoices.map(inv => ({
-      InvoiceNumber: inv.invoiceNumber,
-      Date: inv.date,
-      PatientName: inv.patientName,
-      PatientPhone: inv.patientPhone,
-      Doctor: inv.doctorName,
-      Subtotal: inv.subtotal,
-      Tax: inv.totalTax,
-      GrandTotal: inv.grandTotal,
-      AmountPaid: inv.amountPaid,
-      BalanceDue: inv.balanceDue,
-      Status: inv.status,
-      ProceduresCount: inv.items.length
-    }));
-    exportToCSV(data, `Smile7dental_Invoices_${new Date().toISOString().split('T')[0]}.csv`);
-  };
+    return true;
+  });
 
   const getStatusBadge = (status: PaymentStatus) => {
     switch (status) {
       case 'paid':
         return (
-          <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold px-2.5 py-0.5 rounded-full">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200">
             Paid
           </span>
         );
       case 'partial':
         return (
-          <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold px-2.5 py-0.5 rounded-full">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-amber-100 text-amber-800 border border-amber-200">
             Partial
           </span>
         );
       case 'unpaid':
-      default:
         return (
-          <span className="inline-flex items-center gap-1 bg-rose-50 text-rose-700 border border-rose-200 text-xs font-bold px-2.5 py-0.5 rounded-full">
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-rose-100 text-rose-800 border border-rose-200">
             Unpaid
           </span>
         );
     }
   };
 
+  const handleExportCSV = () => {
+    const rows = filteredInvoices.map(inv => ({
+      InvoiceNumber: inv.invoiceNumber,
+      Date: inv.date.split('T')[0],
+      PatientName: inv.patientName,
+      PatientPhone: inv.patientPhone,
+      GrandTotal: inv.grandTotal,
+      AmountPaid: inv.amountPaid,
+      BalanceDue: inv.balanceDue,
+      Status: inv.status,
+      Doctor: inv.doctorName || clinicProfile.dentistInCharge
+    }));
+    exportToCSV(rows, `Smile7dental_Invoices_${todayStr}.csv`);
+  };
+
   return (
-    <div className="space-y-6">
-      {/* Header with Title & Action */}
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+    <div className="space-y-4">
+      {/* Header Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">Invoice Ledger & Billing</h1>
+          <h1 className="text-lg font-bold text-slate-900 tracking-tight">
+            Invoices & Clinical Ledgers
+          </h1>
           <p className="text-xs text-slate-500">
-            Track patient invoices, generate printable receipts, and manage treatment settlements
+            Manage tax bills, dispatch invoices via WhatsApp/Email, and track payments
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={handleExportCSV}
-            className="px-3.5 py-2 text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors flex items-center gap-1.5"
+            className="px-3.5 py-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors flex items-center gap-1.5"
+            title="Export CSV spreadsheet"
           >
             <Download className="w-3.5 h-3.5" />
-            Export CSV
+            <span className="hidden sm:inline">Export CSV</span>
           </button>
 
           <button
@@ -221,19 +225,19 @@ export const InvoiceList: React.FC<InvoiceListProps> = ({
                   <th className="py-3.5 px-4">Treatments & Teeth</th>
                   <th className="py-3.5 px-4 text-right">Total</th>
                   <th className="py-3.5 px-4 text-right">Paid</th>
-                  <th className="py-3.5 px-4 text-right">Balance Due</th>
+                  <th className="py-3.5 px-4 text-right">Due</th>
                   <th className="py-3.5 px-4 text-center">Status</th>
                   <th className="py-3.5 px-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {filteredInvoices.map((inv) => (
-                  <tr
+                {filteredInvoices.map(inv => (
+                  <tr 
                     key={inv.id}
-                    className="hover:bg-slate-50/60 transition-colors group cursor-pointer"
                     onClick={() => onViewInvoice(inv.id)}
+                    className="hover:bg-slate-50/80 transition-colors cursor-pointer group"
                   >
-                    <td className="py-3.5 px-4 font-mono font-bold text-teal-800">
+                    <td className="py-3.5 px-4 font-mono font-bold text-teal-900 whitespace-nowrap">
                       {inv.invoiceNumber}
                     </td>
 
@@ -288,6 +292,26 @@ export const InvoiceList: React.FC<InvoiceListProps> = ({
 
                     <td className="py-3.5 px-4 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-end gap-1">
+                        {/* Quick WhatsApp */}
+                        <button
+                          type="button"
+                          onClick={() => sendWhatsAppInvoice(inv, clinicProfile, inv.patientPhone)}
+                          className="p-1.5 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
+                          title="Send via WhatsApp"
+                        >
+                          <MessageSquare className="w-4 h-4" />
+                        </button>
+
+                        {/* Share Modal Trigger */}
+                        <button
+                          type="button"
+                          onClick={() => setShareInvoiceId(inv.id)}
+                          className="p-1.5 text-slate-500 hover:text-teal-700 hover:bg-teal-50 rounded-lg transition-colors"
+                          title="Share / Email Invoice"
+                        >
+                          <Share2 className="w-4 h-4" />
+                        </button>
+
                         <button
                           type="button"
                           onClick={() => onViewInvoice(inv.id)}
@@ -318,12 +342,12 @@ export const InvoiceList: React.FC<InvoiceListProps> = ({
                         <button
                           type="button"
                           onClick={() => {
-                            if (window.confirm(`Are you sure you want to delete invoice ${inv.invoiceNumber}?`)) {
+                            if (window.confirm(`Delete invoice ${inv.invoiceNumber}? This will revert payment records.`)) {
                               deleteInvoice(inv.id);
                             }
                           }}
                           className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-                          title="Delete"
+                          title="Delete Invoice"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -336,6 +360,14 @@ export const InvoiceList: React.FC<InvoiceListProps> = ({
           </div>
         )}
       </div>
+
+      {/* Share / Dispatch Submodal */}
+      {shareInvoiceId && (
+        <ShareInvoiceModal
+          invoiceId={shareInvoiceId}
+          onClose={() => setShareInvoiceId(null)}
+        />
+      )}
     </div>
   );
 };
