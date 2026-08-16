@@ -45,11 +45,7 @@ const isBillingRoute = (): boolean => {
   return false;
 };
 
-interface DentalAppContentProps {
-  onBackToWebsite: () => void;
-}
-
-const DentalAppContent: React.FC<DentalAppContentProps> = ({ onBackToWebsite }) => {
+const DentalAppContent: React.FC = () => {
   const { isAuthenticated } = useDental();
   const [activeTab, setActiveTab] = useState<string>('dashboard');
 
@@ -88,18 +84,16 @@ const DentalAppContent: React.FC<DentalAppContentProps> = ({ onBackToWebsite }) 
     return (
       <AdminLogin 
         onLoginSuccess={() => setActiveTab('dashboard')} 
-        onBackToWebsite={onBackToWebsite}
       />
     );
   }
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
-      {/* Top Navigation Bar with Back to Main Website button */}
+      {/* Top Navigation Bar */}
       <Navbar
         onOpenCreateInvoice={() => handleOpenCreateInvoice()}
         activeTab={activeTab}
-        onBackToWebsite={onBackToWebsite}
       />
 
       {/* Main Workspace Layout */}
@@ -108,15 +102,10 @@ const DentalAppContent: React.FC<DentalAppContentProps> = ({ onBackToWebsite }) 
         <Sidebar
           activeTab={activeTab}
           onTabChange={(tab) => {
-            if (tab === 'website') {
-              onBackToWebsite();
-              return;
-            }
             setActiveTab(tab);
             setInvoicePreselectedPatientId(undefined);
           }}
           onOpenCreateInvoice={() => handleOpenCreateInvoice()}
-          onBackToWebsite={onBackToWebsite}
         />
 
         {/* Content Area */}
@@ -274,15 +263,6 @@ export function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  const handleBackToWebsite = useCallback(() => {
-    window.location.hash = '';
-    if (window.location.search) {
-      window.history.replaceState({}, '', window.location.pathname);
-    }
-    setIsBilling(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
-
   // If patient opened a direct invoice download link, directly render the Instant Downloader!
   if (directDownloadData) {
     return (
@@ -296,7 +276,7 @@ export function App() {
   return (
     <DentalProvider>
       {isBilling ? (
-        <DentalAppContent onBackToWebsite={handleBackToWebsite} />
+        <DentalAppContent />
       ) : (
         <MainClinicWebsite onOpenBillingPortal={handleOpenBillingPortal} />
       )}

@@ -7,23 +7,19 @@ import {
   Stethoscope, 
   CreditCard, 
   Settings,
-  Plus,
-  Globe,
-  ArrowRight
+  Plus
 } from 'lucide-react';
 
 interface SidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   onOpenCreateInvoice: () => void;
-  onBackToWebsite?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   onTabChange,
-  onOpenCreateInvoice,
-  onBackToWebsite
+  onOpenCreateInvoice
 }) => {
   const { invoices, patients, stats } = useDental();
 
@@ -82,20 +78,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           );
         })}
-
-        {onBackToWebsite && (
-          <button
-            type="button"
-            onClick={onBackToWebsite}
-            className="flex items-center justify-between p-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap md:w-full text-teal-900 bg-teal-50/80 hover:bg-teal-100/90 border border-teal-200 shadow-xs cursor-pointer mt-1"
-          >
-            <div className="flex items-center gap-3">
-              <Globe className="w-4 h-4 text-teal-700" />
-              <span>Clinic Main Page</span>
-            </div>
-            <ArrowRight className="w-3.5 h-3.5 text-teal-600 hidden md:block" />
-          </button>
-        )}
       </nav>
 
       {/* Pending Due Alert Widget */}

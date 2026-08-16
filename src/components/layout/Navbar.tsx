@@ -1,15 +1,14 @@
 import React from 'react';
 import { useDental } from '../../context/DentalContext';
-import { Plus, Lock, Globe, ShieldCheck, ArrowLeft } from 'lucide-react';
+import { Plus, Lock, Globe, ShieldCheck } from 'lucide-react';
 import logoIcon from '../../assets/smile7-logo-icon.png';
 
 interface NavbarProps {
   onOpenCreateInvoice: () => void;
   activeTab: string;
-  onBackToWebsite?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenCreateInvoice, onBackToWebsite }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenCreateInvoice }) => {
   const { 
     clinicProfile, 
     activeToothNotation, 
@@ -24,18 +23,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCreateInvoice, onBackToWeb
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
         {/* Clinic Branding with Official Logo */}
         <div className="flex items-center gap-3">
-          {onBackToWebsite && (
-            <button
-              type="button"
-              onClick={onBackToWebsite}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all border border-slate-200 shrink-0 cursor-pointer"
-              title="Return to Main Smile7 Dental Clinic Website"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Main Website</span>
-            </button>
-          )}
-
           <div className="w-10 h-10 bg-white border border-slate-200 rounded-xl p-1 flex items-center justify-center shadow-xs overflow-hidden">
             <img 
               src={logoIcon} 

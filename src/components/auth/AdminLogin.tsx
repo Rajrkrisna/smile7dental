@@ -5,24 +5,22 @@ import {
   Lock, 
   KeyRound, 
   ArrowRight, 
-  ArrowLeft,
   AlertCircle, 
   CheckCircle2, 
-  Globe,
-  Stethoscope,
-  Eye,
-  EyeOff,
-  UserCheck
+  Globe, 
+  Stethoscope, 
+  Eye, 
+  EyeOff, 
+  UserCheck 
 } from 'lucide-react';
 import logoIcon from '../../assets/smile7-logo-icon.png';
 import logoText from '../../assets/smile7-logo-text.jpg';
 
 interface AdminLoginProps {
   onLoginSuccess: () => void;
-  onBackToWebsite?: () => void;
 }
 
-export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBackToWebsite }) => {
+export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
   const { adminAuth, loginWithPin, loginWithPassword, setupMasterCredentials, clinicProfile } = useDental();
   
   // Check if credentials are set up
@@ -196,20 +194,9 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBackTo
           </span>
         </div>
 
-        {/* Subdomain Indicator & Back Button */}
+        {/* Subdomain Indicator */}
         <div className="flex items-center gap-3">
-          {onBackToWebsite && (
-            <button
-              type="button"
-              onClick={onBackToWebsite}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold border border-slate-800 transition-all cursor-pointer"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Main Website</span>
-            </button>
-          )}
-
-          <div className="hidden sm:flex items-center gap-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl text-xs">
+          <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl text-xs">
             <Globe className="w-3.5 h-3.5 text-teal-400" />
             <span className="text-slate-400 font-mono text-[11px]">{adminAuth.subdomainUrl || 'billing.smile7dental.com'}</span>
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -529,18 +516,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBackTo
           )}
 
           {/* Clinical Privacy Notice */}
-          <div className="pt-4 border-t border-slate-800/80 text-[11px] text-slate-500 text-center space-y-2.5">
-            {onBackToWebsite && (
-              <button
-                type="button"
-                onClick={onBackToWebsite}
-                className="w-full py-2 px-3 bg-slate-800/70 hover:bg-slate-800 text-slate-300 hover:text-white rounded-xl text-xs font-semibold border border-slate-700/60 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Return to Clinic Main Page</span>
-              </button>
-            )}
-
+          <div className="pt-4 border-t border-slate-800/80 text-[11px] text-slate-500 text-center space-y-1">
             <p className="flex items-center justify-center gap-1 text-[10px] text-slate-400">
               <ShieldCheck className="w-3 h-3 text-teal-500" />
               <span>Encrypted Access: Patient Financial & Medical Records</span>
