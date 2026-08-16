@@ -5,6 +5,7 @@ import {
   Lock, 
   KeyRound, 
   ArrowRight, 
+  ArrowLeft,
   AlertCircle, 
   CheckCircle2, 
   Globe,
@@ -15,9 +16,10 @@ import logoText from '../../assets/smile7-logo-text.jpg';
 
 interface AdminLoginProps {
   onLoginSuccess: () => void;
+  onBackToWebsite?: () => void;
 }
 
-export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
+export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess, onBackToWebsite }) => {
   const { adminAuth, loginWithPin, loginWithPassword, clinicProfile } = useDental();
   
   const [loginMode, setLoginMode] = useState<'pin' | 'password'>('pin');
@@ -117,11 +119,24 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
           </span>
         </div>
 
-        {/* Subdomain Indicator */}
-        <div className="hidden sm:flex items-center gap-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl text-xs">
-          <Globe className="w-3.5 h-3.5 text-teal-400" />
-          <span className="text-slate-400 font-mono text-[11px]">{adminAuth.subdomainUrl || 'billing.smile7dental.com'}</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        {/* Subdomain Indicator & Back Button */}
+        <div className="flex items-center gap-3">
+          {onBackToWebsite && (
+            <button
+              type="button"
+              onClick={onBackToWebsite}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold border border-slate-800 transition-all cursor-pointer"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Main Website</span>
+            </button>
+          )}
+
+          <div className="hidden sm:flex items-center gap-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl text-xs">
+            <Globe className="w-3.5 h-3.5 text-teal-400" />
+            <span className="text-slate-400 font-mono text-[11px]">{adminAuth.subdomainUrl || 'billing.smile7dental.com'}</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          </div>
         </div>
       </header>
 

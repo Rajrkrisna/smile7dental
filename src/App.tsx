@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { DentalProvider, useDental } from './context/DentalContext';
 import { Navbar } from './components/layout/Navbar';
 import { Sidebar } from './components/layout/Sidebar';
@@ -14,10 +14,44 @@ import { PaymentHistory } from './components/payments/PaymentHistory';
 import { ClinicSettings } from './components/settings/ClinicSettings';
 import { AdminLogin } from './components/auth/AdminLogin';
 import { PatientInvoiceView } from './components/patient-portal/PatientInvoiceView';
+import { MainClinicWebsite } from './components/website/MainClinicWebsite';
 import { decodeInvoicePayload } from './utils/shareUtils';
 import type { Invoice, ClinicProfile } from './types';
 
-const DentalAppContent: React.FC = () => {
+// Helper to determine if we should open the Billing Suite or Main Website
+const isBillingRoute = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  const host = window.location.hostname.toLowerCase();
+  const search = window.location.search.toLowerCase();
+  const hash = window.location.hash.toLowerCase();
+  const path = window.location.pathname.toLowerCase();
+
+  // Subdomain detection: e.g. billing.smile7dental.com or billing.localhost
+  if (host.startsWith('billing.') || host.includes('billing.')) return true;
+
+  // Query parameter or hash triggers
+  if (
+    search.includes('view=invoice') ||
+    search.includes('token=') ||
+    search.includes('portal=billing') ||
+    search.includes('billing')
+  ) {
+    return true;
+  }
+
+  // Path or hash
+  if (path.includes('/billing') || hash.includes('billing') || hash.includes('portal')) {
+    return true;
+  }
+
+  return false;
+};
+
+interface DentalAppContentProps {
+  onBackToWebsite: () => void;
+}
+
+const DentalAppContent: React.FC<DentalAppContentProps> = ({ onBackToWebsite }) => {
   const { isAuthenticated, getInvoiceById, clinicProfile } = useDental();
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   
@@ -94,7 +128,6 @@ const DentalAppContent: React.FC = () => {
         invoice={patientPortalData.invoice}
         clinic={patientPortalData.clinic}
         onAdminLoginClick={() => {
-          // Clear query params and show doctor admin login
           window.history.replaceState({}, '', window.location.pathname);
           setPatientPortalData(null);
         }}
@@ -104,15 +137,21 @@ const DentalAppContent: React.FC = () => {
 
   // If unauthorized, show Admin security portal
   if (!isAuthenticated) {
-    return <AdminLogin onLoginSuccess={() => setActiveTab('dashboard')} />;
+    return (
+      <AdminLogin 
+        onLoginSuccess={() => setActiveTab('dashboard')} 
+        onBackToWebsite={onBackToWebsite}
+      />
+    );
   }
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
-      {/* Top Navigation Bar */}
+      {/* Top Navigation Bar with Back to Main Website button */}
       <Navbar
         onOpenCreateInvoice={() => handleOpenCreateInvoice()}
         activeTab={activeTab}
+        onBackToWebsite={onBackToWebsite}
       />
 
       {/* Main Workspace Layout */}
@@ -230,11 +269,47 @@ const DentalAppContent: React.FC = () => {
 };
 
 export function App() {
+  const [isBilling, setIsBilling] = useState<boolean>(() => isBillingRoute());
+
+  // Listen to hash change / popstate for seamless browser navigation
+  useEffect(() => {
+    const handleNavigation = () => {
+      setIsBilling(isBillingRoute());
+    };
+
+    window.addEventListener('popstate', handleNavigation);
+    window.addEventListener('hashchange', handleNavigation);
+    return () => {
+      window.removeEventListener('popstate', handleNavigation);
+      window.removeEventListener('hashchange', handleNavigation);
+    };
+  }, []);
+
+  const handleOpenBillingPortal = useCallback(() => {
+    window.location.hash = 'billing';
+    setIsBilling(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  const handleBackToWebsite = useCallback(() => {
+    window.location.hash = '';
+    if (window.location.search) {
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+    setIsBilling(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   return (
     <DentalProvider>
-      <DentalAppContent />
+      {isBilling ? (
+        <DentalAppContent onBackToWebsite={handleBackToWebsite} />
+      ) : (
+        <MainClinicWebsite onOpenBillingPortal={handleOpenBillingPortal} />
+      )}
     </DentalProvider>
   );
 }
 
 export default App;
+
