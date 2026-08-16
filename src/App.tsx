@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DentalProvider, useDental } from './context/DentalContext';
 import { Navbar } from './components/layout/Navbar';
 import { Sidebar } from './components/layout/Sidebar';
@@ -13,11 +13,50 @@ import { TreatmentCatalog } from './components/treatments/TreatmentCatalog';
 import { PaymentHistory } from './components/payments/PaymentHistory';
 import { ClinicSettings } from './components/settings/ClinicSettings';
 import { AdminLogin } from './components/auth/AdminLogin';
+import { PatientInvoiceView } from './components/patient-portal/PatientInvoiceView';
+import { decodeInvoicePayload } from './utils/shareUtils';
+import type { Invoice, ClinicProfile } from './types';
 
 const DentalAppContent: React.FC = () => {
-  const { isAuthenticated } = useDental();
+  const { isAuthenticated, getInvoiceById, clinicProfile } = useDental();
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   
+  // Public Patient Portal State (URL param based)
+  const [patientPortalData, setPatientPortalData] = useState<{
+    invoice: Invoice;
+    clinic: ClinicProfile;
+  } | null>(null);
+
+  // Check URL on load for patient download link: ?view=invoice&id=...&token=...
+  useEffect(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isInvoiceView = urlParams.get('view') === 'invoice';
+      const token = urlParams.get('token');
+      const invoiceId = urlParams.get('id') || urlParams.get('invoice_id');
+
+      if (isInvoiceView || token) {
+        if (token) {
+          const decoded = decodeInvoicePayload(token);
+          if (decoded) {
+            setPatientPortalData(decoded);
+            return;
+          }
+        }
+        
+        if (invoiceId) {
+          const localInv = getInvoiceById(invoiceId);
+          if (localInv) {
+            setPatientPortalData({ invoice: localInv, clinic: clinicProfile });
+            return;
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Failed to parse patient portal URL:', e);
+    }
+  }, [getInvoiceById, clinicProfile]);
+
   // Modals & Sub-views State
   const [viewInvoiceId, setViewInvoiceId] = useState<string | null>(null);
   const [invoicePrintMode, setInvoicePrintMode] = useState<'none' | 'a4' | 'thermal'>('none');
@@ -47,6 +86,21 @@ const DentalAppContent: React.FC = () => {
     setViewInvoiceId(invoiceId);
     setInvoicePrintMode('thermal');
   };
+
+  // If a patient is viewing their invoice link, show the Patient Portal directly without admin login
+  if (patientPortalData) {
+    return (
+      <PatientInvoiceView
+        invoice={patientPortalData.invoice}
+        clinic={patientPortalData.clinic}
+        onAdminLoginClick={() => {
+          // Clear query params and show doctor admin login
+          window.history.replaceState({}, '', window.location.pathname);
+          setPatientPortalData(null);
+        }}
+      />
+    );
+  }
 
   // If unauthorized, show Admin security portal
   if (!isAuthenticated) {

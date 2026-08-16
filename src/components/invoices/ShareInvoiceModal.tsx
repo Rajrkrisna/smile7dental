@@ -5,6 +5,7 @@ import {
   sendEmailInvoice, 
   generateWhatsAppInvoiceText, 
   generateEmailInvoiceContent,
+  generateInvoiceDownloadUrl,
   sanitizeIndianPhoneNumber 
 } from '../../utils/shareUtils';
 import { 
@@ -14,7 +15,8 @@ import {
   Check, 
   ExternalLink,
   MessageSquare,
-  Sparkles
+  Sparkles,
+  Link
 } from 'lucide-react';
 
 interface ShareInvoiceModalProps {
@@ -26,7 +28,7 @@ export const ShareInvoiceModal: React.FC<ShareInvoiceModalProps> = ({
   invoiceId,
   onClose
 }) => {
-  const { getInvoiceById, clinicProfile, getPatientById } = useDental();
+  const { getInvoiceById, clinicProfile, getPatientById, adminAuth } = useDental();
   const invoice = getInvoiceById(invoiceId);
   const patient = invoice ? getPatientById(invoice.patientId) : undefined;
 
@@ -42,19 +44,27 @@ export const ShareInvoiceModal: React.FC<ShareInvoiceModalProps> = ({
     patient?.email || ''
   );
 
+  const [copiedLink, setCopiedLink] = useState<boolean>(false);
   const [copiedText, setCopiedText] = useState<boolean>(false);
 
   if (!invoice) return null;
 
-  const whatsAppText = generateWhatsAppInvoiceText(invoice, clinicProfile);
-  const emailContent = generateEmailInvoiceContent(invoice, clinicProfile);
+  const downloadUrl = generateInvoiceDownloadUrl(invoice, clinicProfile, adminAuth.subdomainUrl);
+  const whatsAppText = generateWhatsAppInvoiceText(invoice, clinicProfile, adminAuth.subdomainUrl);
+  const emailContent = generateEmailInvoiceContent(invoice, clinicProfile, adminAuth.subdomainUrl);
 
   const handleSendWhatsApp = () => {
-    sendWhatsAppInvoice(invoice, clinicProfile, whatsappPhone);
+    sendWhatsAppInvoice(invoice, clinicProfile, whatsappPhone, adminAuth.subdomainUrl);
   };
 
   const handleSendEmail = () => {
-    sendEmailInvoice(invoice, clinicProfile, recipientEmail);
+    sendEmailInvoice(invoice, clinicProfile, recipientEmail, adminAuth.subdomainUrl);
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(downloadUrl);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2500);
   };
 
   const handleCopyClipboard = (text: string) => {
@@ -76,7 +86,7 @@ export const ShareInvoiceModal: React.FC<ShareInvoiceModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-base font-bold text-slate-900">
-                  Send Invoice to Patient
+                  Dispatch Invoice to Patient
                 </h2>
                 <span className="font-mono text-xs font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
                   {invoice.invoiceNumber}
@@ -91,10 +101,53 @@ export const ShareInvoiceModal: React.FC<ShareInvoiceModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded-lg transition-colors"
+            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
+        </div>
+
+        {/* Public Download Link Banner */}
+        <div className="p-4 bg-teal-50/80 border-b border-teal-200/80 text-xs space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="font-bold text-teal-950 flex items-center gap-1.5">
+              <Link className="w-3.5 h-3.5 text-teal-700" />
+              Patient Download & Viewing Link:
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                className="text-[11px] font-bold text-teal-800 hover:text-teal-950 bg-white px-2.5 py-1 rounded-lg border border-teal-200 shadow-xs flex items-center gap-1 cursor-pointer"
+              >
+                {copiedLink ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>Copy Link</span>
+                  </>
+                )}
+              </button>
+
+              <a
+                href={downloadUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="text-[11px] font-bold text-teal-800 hover:text-teal-950 bg-white px-2.5 py-1 rounded-lg border border-teal-200 shadow-xs flex items-center gap-1"
+              >
+                <span>Preview</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            </div>
+          </div>
+
+          <div className="p-2 bg-white rounded-xl border border-teal-200 font-mono text-[10px] text-teal-900 truncate">
+            {downloadUrl}
+          </div>
         </div>
 
         {/* Tab Selector: WhatsApp vs Email */}
@@ -102,7 +155,7 @@ export const ShareInvoiceModal: React.FC<ShareInvoiceModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveTab('whatsapp')}
-            className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 border ${
+            className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 border cursor-pointer ${
               activeTab === 'whatsapp'
                 ? 'bg-emerald-600 text-white border-emerald-700 shadow-sm shadow-emerald-600/20'
                 : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
@@ -115,7 +168,7 @@ export const ShareInvoiceModal: React.FC<ShareInvoiceModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveTab('email')}
-            className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 border ${
+            className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 border cursor-pointer ${
               activeTab === 'email'
                 ? 'bg-teal-700 text-white border-teal-800 shadow-sm shadow-teal-700/20'
                 : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
@@ -157,13 +210,13 @@ export const ShareInvoiceModal: React.FC<ShareInvoiceModalProps> = ({
                 <div className="flex justify-between items-center mb-1">
                   <label className="font-bold text-slate-700 flex items-center gap-1">
                     <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>WhatsApp Message Preview (Pre-formatted):</span>
+                    <span>WhatsApp Message Preview (With Download Link):</span>
                   </label>
 
                   <button
                     type="button"
                     onClick={() => handleCopyClipboard(whatsAppText)}
-                    className="text-[11px] font-bold text-slate-600 hover:text-emerald-700 flex items-center gap-1"
+                    className="text-[11px] font-bold text-slate-600 hover:text-emerald-700 flex items-center gap-1 cursor-pointer"
                   >
                     {copiedText ? (
                       <>
@@ -190,7 +243,7 @@ export const ShareInvoiceModal: React.FC<ShareInvoiceModalProps> = ({
                 onClick={handleSendWhatsApp}
                 className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold rounded-xl shadow-md shadow-emerald-600/25 flex items-center justify-center gap-2 text-sm transition-all cursor-pointer"
               >
-                <span>Launch WhatsApp & Dispatch Invoice</span>
+                <span>Launch WhatsApp & Send with Download Link</span>
                 <ExternalLink className="w-4 h-4" />
               </button>
             </div>
@@ -228,13 +281,13 @@ export const ShareInvoiceModal: React.FC<ShareInvoiceModalProps> = ({
               <div>
                 <div className="flex justify-between items-center mb-1">
                   <label className="font-bold text-slate-700 flex items-center gap-1">
-                    <span>Email Message Body:</span>
+                    <span>Email Message Body (Includes Download Link):</span>
                   </label>
 
                   <button
                     type="button"
                     onClick={() => handleCopyClipboard(emailContent.body)}
-                    className="text-[11px] font-bold text-slate-600 hover:text-teal-700 flex items-center gap-1"
+                    className="text-[11px] font-bold text-slate-600 hover:text-teal-700 flex items-center gap-1 cursor-pointer"
                   >
                     {copiedText ? (
                       <>
@@ -278,7 +331,7 @@ export const ShareInvoiceModal: React.FC<ShareInvoiceModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-xl transition-colors"
+            className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-xl transition-colors cursor-pointer"
           >
             Close
           </button>
