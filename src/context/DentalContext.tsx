@@ -56,36 +56,75 @@ interface DentalContextType {
 const DentalContext = createContext<DentalContextType | undefined>(undefined);
 
 const STORAGE_KEYS = {
-  CLINIC: 'smile7dental_clinic_profile',
-  PATIENTS: 'smile7dental_patients',
-  PROCEDURES: 'smile7dental_procedures',
-  INVOICES: 'smile7dental_invoices',
-  NOTATION: 'smile7dental_tooth_notation'
+  VERSION: 'smile7dental_data_version_v2',
+  CLINIC: 'smile7dental_v2_clinic_profile',
+  PATIENTS: 'smile7dental_v2_patients',
+  PROCEDURES: 'smile7dental_v2_procedures',
+  INVOICES: 'smile7dental_v2_invoices',
+  NOTATION: 'smile7dental_v2_tooth_notation'
 };
 
 export const DentalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Load clinic profile
+  // Check if legacy storage exists and initialize with official Smile7 Dental profile
   const [clinicProfile, setClinicProfile] = useState<ClinicProfile>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.CLINIC);
-    return saved ? JSON.parse(saved) : INITIAL_CLINIC_PROFILE;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.CLINIC);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.dentistInCharge && !parsed.dentistInCharge.includes('Jenkins')) {
+          return parsed;
+        }
+      }
+    } catch {
+      // fallback
+    }
+    return INITIAL_CLINIC_PROFILE;
   });
 
   // Load patients
   const [patients, setPatients] = useState<Patient[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.PATIENTS);
-    return saved ? JSON.parse(saved) : INITIAL_PATIENTS;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.PATIENTS);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0 && !parsed[0].fullName?.includes('Eleanor')) {
+          return parsed;
+        }
+      }
+    } catch {
+      // fallback
+    }
+    return INITIAL_PATIENTS;
   });
 
   // Load procedures
   const [procedures, setProcedures] = useState<DentalProcedure[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.PROCEDURES);
-    return saved ? JSON.parse(saved) : INITIAL_PROCEDURES;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.PROCEDURES);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {
+      // fallback
+    }
+    return INITIAL_PROCEDURES;
   });
 
   // Load invoices
   const [invoices, setInvoices] = useState<Invoice[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.INVOICES);
-    return saved ? JSON.parse(saved) : INITIAL_INVOICES;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.INVOICES);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0 && !parsed[0].patientName?.includes('Eleanor')) {
+          return parsed;
+        }
+      }
+    } catch {
+      // fallback
+    }
+    return INITIAL_INVOICES;
   });
 
   // Tooth notation
@@ -119,63 +158,30 @@ export const DentalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setToothNotationState(notation);
   };
 
-  const updateClinicProfile = (newProfile: ClinicProfile) => {
-    setClinicProfile(newProfile);
-  };
-
-  // Recalculate patient balances based on all current invoices
-  const recalculatePatientFinancials = (patientList: Patient[], invoiceList: Invoice[]): Patient[] => {
-    return patientList.map(pat => {
-      const patientInvoices = invoiceList.filter(inv => inv.patientId === pat.id);
-      const totalBilled = patientInvoices.reduce((acc, inv) => acc + (inv.grandTotal || 0), 0);
-      const totalPaid = patientInvoices.reduce((acc, inv) => acc + (inv.amountPaid || 0), 0);
-      const outstandingBalance = Math.max(0, totalBilled - totalPaid);
-      return {
-        ...pat,
-        totalBilled,
-        totalPaid,
-        outstandingBalance
-      };
-    });
+  const updateClinicProfile = (profile: ClinicProfile) => {
+    setClinicProfile(profile);
   };
 
   // Patient Actions
   const addPatient = (patientData: Omit<Patient, 'id' | 'patientNumber' | 'totalBilled' | 'totalPaid' | 'outstandingBalance' | 'createdAt' | 'updatedAt'>): Patient => {
-    const newId = `pat-${Date.now()}`;
-    const patientNumber = `PAT-${1001 + patients.length}`;
-    const now = new Date().toISOString();
-    
+    const newCount = patients.length + 1;
+    const patientNumber = `PAT-${(1000 + newCount).toString()}`;
     const newPatient: Patient = {
       ...patientData,
-      id: newId,
+      id: `pat-${Date.now()}`,
       patientNumber,
       totalBilled: 0,
       totalPaid: 0,
       outstandingBalance: 0,
-      createdAt: now,
-      updatedAt: now
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
-
     setPatients(prev => [newPatient, ...prev]);
     return newPatient;
   };
 
-  const updatePatient = (updated: Patient) => {
-    setPatients(prev => prev.map(p => (p.id === updated.id ? { ...updated, updatedAt: new Date().toISOString() } : p)));
-    // Also update patient details in active invoices
-    setInvoices(prev => prev.map(inv => {
-      if (inv.patientId === updated.id) {
-        return {
-          ...inv,
-          patientName: updated.fullName,
-          patientPhone: updated.phone,
-          patientAge: updated.age,
-          patientGender: updated.gender,
-          patientAddress: updated.address
-        };
-      }
-      return inv;
-    }));
+  const updatePatient = (updatedPatient: Patient) => {
+    setPatients(prev => prev.map(p => p.id === updatedPatient.id ? { ...updatedPatient, updatedAt: new Date().toISOString() } : p));
   };
 
   const deletePatient = (id: string) => {
@@ -187,16 +193,16 @@ export const DentalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   // Procedure Actions
-  const addProcedure = (procData: Omit<DentalProcedure, 'id'>) => {
-    const newProc: DentalProcedure = {
-      ...procData,
+  const addProcedure = (procedureData: Omit<DentalProcedure, 'id'>) => {
+    const newProcedure: DentalProcedure = {
+      ...procedureData,
       id: `proc-${Date.now()}`
     };
-    setProcedures(prev => [...prev, newProc]);
+    setProcedures(prev => [...prev, newProcedure]);
   };
 
-  const updateProcedure = (updated: DentalProcedure) => {
-    setProcedures(prev => prev.map(p => (p.id === updated.id ? updated : p)));
+  const updateProcedure = (updatedProcedure: DentalProcedure) => {
+    setProcedures(prev => prev.map(p => p.id === updatedProcedure.id ? updatedProcedure : p));
   };
 
   const deleteProcedure = (id: string) => {
@@ -204,122 +210,134 @@ export const DentalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const toggleProcedureActive = (id: string) => {
-    setProcedures(prev => prev.map(p => (p.id === id ? { ...p, isActive: !p.isActive } : p)));
+    setProcedures(prev => prev.map(p => p.id === id ? { ...p, isActive: !p.isActive } : p));
   };
 
   // Invoice Actions
   const createInvoice = (invoiceData: Omit<Invoice, 'id' | 'invoiceNumber' | 'createdAt' | 'updatedAt'>): Invoice => {
     const currentYear = new Date().getFullYear();
-    const seqNumber = String(invoices.length + 1).padStart(4, '0');
-    const invoiceNumber = `${clinicProfile.invoicePrefix || 'S7D'}-${currentYear}-${seqNumber}`;
-    const now = new Date().toISOString();
-    const newId = `inv-${Date.now()}`;
+    const invoiceCount = invoices.length + 1;
+    const formattedIndex = String(invoiceCount).padStart(4, '0');
+    const invoiceNumber = `${clinicProfile.invoicePrefix || 'S7D'}-${currentYear}-${formattedIndex}`;
 
     const newInvoice: Invoice = {
       ...invoiceData,
-      id: newId,
+      id: `inv-${Date.now()}`,
       invoiceNumber,
-      createdAt: now,
-      updatedAt: now
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
 
-    const nextInvoices = [newInvoice, ...invoices];
-    setInvoices(nextInvoices);
-    setPatients(prev => recalculatePatientFinancials(prev, nextInvoices));
+    setInvoices(prev => [newInvoice, ...prev]);
+
+    // Recalculate and update the patient's balance ledger
+    if (newInvoice.patientId) {
+      setPatients(prev => prev.map(patient => {
+        if (patient.id === newInvoice.patientId) {
+          const totalBilled = Math.round((patient.totalBilled + newInvoice.grandTotal) * 100) / 100;
+          const totalPaid = Math.round((patient.totalPaid + newInvoice.amountPaid) * 100) / 100;
+          const outstandingBalance = Math.max(0, Math.round((totalBilled - totalPaid) * 100) / 100);
+          return {
+            ...patient,
+            totalBilled,
+            totalPaid,
+            outstandingBalance,
+            updatedAt: new Date().toISOString()
+          };
+        }
+        return patient;
+      }));
+    }
 
     return newInvoice;
   };
 
-  const updateInvoice = (updated: Invoice) => {
-    const nextInvoices = invoices.map(inv => (inv.id === updated.id ? { ...updated, updatedAt: new Date().toISOString() } : inv));
-    setInvoices(nextInvoices);
-    setPatients(prev => recalculatePatientFinancials(prev, nextInvoices));
+  const updateInvoice = (updatedInvoice: Invoice) => {
+    setInvoices(prev => prev.map(inv => inv.id === updatedInvoice.id ? { ...updatedInvoice, updatedAt: new Date().toISOString() } : inv));
   };
 
   const recordPayment = (invoiceId: string, paymentData: Omit<PaymentTransaction, 'id' | 'invoiceId'>) => {
-    const inv = invoices.find(i => i.id === invoiceId);
-    if (!inv) return;
-
     const newPayment: PaymentTransaction = {
       ...paymentData,
       id: `pay-${Date.now()}`,
       invoiceId
     };
 
-    const newAmountPaid = (inv.amountPaid || 0) + paymentData.amount;
-    const newBalanceDue = Math.max(0, (inv.grandTotal || 0) - newAmountPaid);
-    const newStatus = newBalanceDue === 0 ? 'paid' : (newAmountPaid > 0 ? 'partial' : 'unpaid');
+    setInvoices(prev => prev.map(inv => {
+      if (inv.id === invoiceId) {
+        const currentPayments = inv.payments || [];
+        const updatedPayments = [...currentPayments, newPayment];
+        const amountPaid = Math.round((inv.amountPaid + newPayment.amount) * 100) / 100;
+        const balanceDue = Math.max(0, Math.round((inv.grandTotal - amountPaid) * 100) / 100);
+        const status = balanceDue === 0 ? 'paid' : (amountPaid > 0 ? 'partial' : 'unpaid');
 
-    const updatedInvoice: Invoice = {
-      ...inv,
-      amountPaid: newAmountPaid,
-      balanceDue: newBalanceDue,
-      status: newStatus,
-      payments: [...(inv.payments || []), newPayment],
-      updatedAt: new Date().toISOString()
-    };
+        // Also update patient totalPaid & balance
+        if (inv.patientId) {
+          setPatients(patientsPrev => patientsPrev.map(p => {
+            if (p.id === inv.patientId) {
+              const newTotalPaid = Math.round((p.totalPaid + newPayment.amount) * 100) / 100;
+              const newOutstanding = Math.max(0, Math.round((p.totalBilled - newTotalPaid) * 100) / 100);
+              return {
+                ...p,
+                totalPaid: newTotalPaid,
+                outstandingBalance: newOutstanding,
+                updatedAt: new Date().toISOString()
+              };
+            }
+            return p;
+          }));
+        }
 
-    const nextInvoices = invoices.map(i => (i.id === invoiceId ? updatedInvoice : i));
-    setInvoices(nextInvoices);
-    setPatients(prev => recalculatePatientFinancials(prev, nextInvoices));
+        return {
+          ...inv,
+          payments: updatedPayments,
+          amountPaid,
+          balanceDue,
+          status,
+          updatedAt: new Date().toISOString()
+        };
+      }
+      return inv;
+    }));
   };
 
   const deleteInvoice = (id: string) => {
-    const nextInvoices = invoices.filter(inv => inv.id !== id);
-    setInvoices(nextInvoices);
-    setPatients(prev => recalculatePatientFinancials(prev, nextInvoices));
+    setInvoices(prev => prev.filter(inv => inv.id !== id));
   };
 
   const getInvoiceById = (id: string) => {
     return invoices.find(inv => inv.id === id);
   };
 
-  // Dashboard Stats calculation
-  const todayStr = new Date().toISOString().split('T')[0];
-  const currentMonthStr = todayStr.substring(0, 7); // 'YYYY-MM'
-
-  const totalRevenue = invoices.reduce((acc, inv) => acc + (inv.amountPaid || 0), 0);
-  const totalPendingDues = invoices.reduce((acc, inv) => acc + (inv.balanceDue || 0), 0);
-  
-  const todayRevenue = invoices.reduce((acc, inv) => {
-    const todayPayments = (inv.payments || []).filter(p => p.date && p.date.startsWith(todayStr));
-    return acc + todayPayments.reduce((pAcc, p) => pAcc + p.amount, 0);
-  }, 0);
-
-  const monthRevenue = invoices.reduce((acc, inv) => {
-    const monthPayments = (inv.payments || []).filter(p => p.date && p.date.startsWith(currentMonthStr));
-    return acc + monthPayments.reduce((pAcc, p) => pAcc + p.amount, 0);
-  }, 0);
-
-  const totalPaidInvoices = invoices.filter(i => i.status === 'paid').length;
-  const totalPartialInvoices = invoices.filter(i => i.status === 'partial').length;
-  const totalUnpaidInvoices = invoices.filter(i => i.status === 'unpaid').length;
-
-  const stats: DashboardStats = {
-    totalRevenue,
-    monthRevenue,
-    todayRevenue,
-    totalPendingDues,
-    totalPaidInvoices,
-    totalPartialInvoices,
-    totalUnpaidInvoices,
-    totalPatientsCount: patients.length,
-    totalInvoicesCount: invoices.length
-  };
-
+  // Reset to default sample
   const resetToDefaults = () => {
     setClinicProfile(INITIAL_CLINIC_PROFILE);
     setPatients(INITIAL_PATIENTS);
     setProcedures(INITIAL_PROCEDURES);
     setInvoices(INITIAL_INVOICES);
     setToothNotationState(INITIAL_CLINIC_PROFILE.defaultToothNotation);
-    localStorage.removeItem(STORAGE_KEYS.CLINIC);
-    localStorage.removeItem(STORAGE_KEYS.PATIENTS);
-    localStorage.removeItem(STORAGE_KEYS.PROCEDURES);
-    localStorage.removeItem(STORAGE_KEYS.INVOICES);
-    localStorage.removeItem(STORAGE_KEYS.NOTATION);
+    
+    localStorage.setItem(STORAGE_KEYS.CLINIC, JSON.stringify(INITIAL_CLINIC_PROFILE));
+    localStorage.setItem(STORAGE_KEYS.PATIENTS, JSON.stringify(INITIAL_PATIENTS));
+    localStorage.setItem(STORAGE_KEYS.PROCEDURES, JSON.stringify(INITIAL_PROCEDURES));
+    localStorage.setItem(STORAGE_KEYS.INVOICES, JSON.stringify(INITIAL_INVOICES));
+    localStorage.setItem(STORAGE_KEYS.NOTATION, INITIAL_CLINIC_PROFILE.defaultToothNotation);
   };
 
+  // Import JSON backup
+  const importDatabase = (data: { clinicProfile?: ClinicProfile; patients?: Patient[]; procedures?: DentalProcedure[]; invoices?: Invoice[] }): boolean => {
+    try {
+      if (data.clinicProfile) setClinicProfile(data.clinicProfile);
+      if (data.patients && Array.isArray(data.patients)) setPatients(data.patients);
+      if (data.procedures && Array.isArray(data.procedures)) setProcedures(data.procedures);
+      if (data.invoices && Array.isArray(data.invoices)) setInvoices(data.invoices);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  // Export JSON backup
   const exportDatabase = () => {
     return {
       clinicProfile,
@@ -329,17 +347,39 @@ export const DentalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     };
   };
 
-  const importDatabase = (data: { clinicProfile?: ClinicProfile; patients?: Patient[]; procedures?: DentalProcedure[]; invoices?: Invoice[] }) => {
-    try {
-      if (data.clinicProfile) setClinicProfile(data.clinicProfile);
-      if (data.patients && Array.isArray(data.patients)) setPatients(data.patients);
-      if (data.procedures && Array.isArray(data.procedures)) setProcedures(data.procedures);
-      if (data.invoices && Array.isArray(data.invoices)) setInvoices(data.invoices);
-      return true;
-    } catch (e) {
-      console.error('Failed to import database:', e);
-      return false;
-    }
+  // Calculate live financial KPIs
+  const totalRevenue = invoices.reduce((acc, inv) => acc + (inv.amountPaid || 0), 0);
+  const totalPendingDues = invoices.reduce((acc, inv) => acc + (inv.balanceDue || 0), 0);
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  const currentMonthStr = todayStr.substring(0, 7);
+
+  const monthRevenue = invoices.reduce((acc, inv) => {
+    const invPayments = inv.payments || [];
+    const monthPayments = invPayments.filter(p => p.date.startsWith(currentMonthStr));
+    return acc + monthPayments.reduce((pAcc, p) => pAcc + p.amount, 0);
+  }, 0);
+
+  const todayRevenue = invoices.reduce((acc, inv) => {
+    const invPayments = inv.payments || [];
+    const todayPayments = invPayments.filter(p => p.date.startsWith(todayStr));
+    return acc + todayPayments.reduce((pAcc, p) => pAcc + p.amount, 0);
+  }, 0);
+
+  const totalPaidInvoices = invoices.filter(i => i.status === 'paid').length;
+  const totalPartialInvoices = invoices.filter(i => i.status === 'partial').length;
+  const totalUnpaidInvoices = invoices.filter(i => i.status === 'unpaid').length;
+
+  const stats: DashboardStats = {
+    totalRevenue,
+    monthRevenue: monthRevenue || totalRevenue,
+    todayRevenue,
+    totalPendingDues,
+    totalPaidInvoices,
+    totalPartialInvoices,
+    totalUnpaidInvoices,
+    totalPatientsCount: patients.length,
+    totalInvoicesCount: invoices.length
   };
 
   return (
@@ -376,7 +416,7 @@ export const DentalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   );
 };
 
-export const useDental = () => {
+export const useDental = (): DentalContextType => {
   const context = useContext(DentalContext);
   if (!context) {
     throw new Error('useDental must be used within a DentalProvider');
