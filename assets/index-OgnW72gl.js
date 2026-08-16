@@ -50,15 +50,27 @@ Error generating stack: `+e.message+`
   </div>
 
   <div class="invoice-card">
-    <!-- Header -->
+    <!-- Header with Official Logo -->
     <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #004884; padding-bottom: 20px;">
-      <div>
-        <h1 style="font-size: 24px; font-weight: 900; color: #004884; letter-spacing: -0.5px;">${t.name}</h1>
-        <p style="font-size: 12px; color: #0284c7; font-weight: 600; margin-top: 2px;">${t.tagline}</p>
-        <div style="font-size: 11px; color: #64748b; margin-top: 6px; line-height: 1.5;">
-          ${t.addressLine1}, ${t.city} - ${t.zipCode}<br>
-          Phone: <strong>${t.phone}</strong> | Email: ${t.email}
-          ${t.taxId?`<br>GSTIN / Tax Reg: <strong>${t.taxId}</strong>`:``}
+      <div style="display: flex; align-items: flex-start; gap: 16px;">
+        <!-- Official Clinic Logo Emblem -->
+        <div style="width: 58px; height: 58px; background: linear-gradient(135deg, #004884 0%, #0284c7 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,72,132,0.25); flex-shrink: 0;">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2C8.5 2 6 4.5 6 7.5C6 9.5 7 11.5 8 13.5C9 15.5 9.5 18 10 21C10.2 21.8 11.2 22 11.8 21.4L12 21.2C12.2 21 12.5 21 12.7 21.2L12.9 21.4C13.5 22 14.5 21.8 14.7 21C15.2 18 15.7 15.5 16.7 13.5C17.7 11.5 18.7 9.5 18.7 7.5C18.7 4.5 16.2 2 12.7 2H12Z" fill="#ffffff" fill-opacity="0.95"/>
+            <path d="M9.5 7C10.5 5.8 12 5.8 13 7C13.5 7.6 14.5 7.6 15 7" stroke="#004884" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="17.5" cy="5.5" r="1.5" fill="#38bdf8"/>
+          </svg>
+        </div>
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <h1 style="font-size: 22px; font-weight: 900; color: #004884; letter-spacing: -0.5px; line-height: 1.1;">${t.name}</h1>
+          </div>
+          <p style="font-size: 11px; color: #0284c7; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 3px;">${t.tagline}</p>
+          <div style="font-size: 11px; color: #64748b; margin-top: 6px; line-height: 1.5;">
+            ${t.addressLine1}, ${t.city} - ${t.zipCode}<br>
+            Phone: <strong>${t.phone}</strong> | Email: ${t.email}
+            ${t.taxId?`<br>GSTIN / Tax Reg: <strong>${t.taxId}</strong>`:``}
+          </div>
         </div>
       </div>
       <div style="text-align: right;">
