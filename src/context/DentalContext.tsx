@@ -147,12 +147,14 @@ export const DentalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const saved = localStorage.getItem(STORAGE_KEYS.PROCEDURES);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map((p: DentalProcedure) => ({ ...p, defaultCost: 0 }));
+        }
       }
     } catch {
       // fallback
     }
-    return INITIAL_PROCEDURES;
+    return INITIAL_PROCEDURES.map(p => ({ ...p, defaultCost: 0 }));
   });
 
   // Load invoices
@@ -201,6 +203,17 @@ export const DentalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.NOTATION, activeToothNotation);
   }, [activeToothNotation]);
+
+  // Ensure all procedure default costs are 0 across all sessions
+  useEffect(() => {
+    setProcedures(prev => {
+      const hasNonZero = prev.some(p => p.defaultCost > 0);
+      if (hasNonZero) {
+        return prev.map(p => ({ ...p, defaultCost: 0 }));
+      }
+      return prev;
+    });
+  }, []);
 
   // Auth Operations
   const setupMasterCredentials = (password: string, pin: string, email?: string) => {

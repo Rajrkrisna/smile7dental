@@ -88,7 +88,7 @@ export const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({
 
   const categories: string[] = ['All', ...Array.from(new Set(procedures.map(p => p.category)))];
 
-  // Helper to add procedure as line item
+  // Helper to add procedure as line item with 0 default cost (manual pricing)
   const handleAddProcedureItem = (proc: typeof procedures[0]) => {
     const newItem: InvoiceItem = {
       id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
@@ -99,12 +99,12 @@ export const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({
       toothNumbers: [],
       surface: '',
       quantity: 1,
-      unitPrice: proc.defaultCost || 0,
+      unitPrice: 0,
       discountType: 'fixed',
       discountValue: 0,
-      taxPercent: proc.taxRatePercent || 0,
+      taxPercent: 0,
       notes: '',
-      lineTotal: proc.defaultCost || 0
+      lineTotal: 0
     };
 
     const nextItems = [...items, newItem];
@@ -139,7 +139,12 @@ export const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({
 
   const removeItem = (index: number) => {
     setItems(prev => prev.filter((_, i) => i !== index));
-    if (activeItemIndexForToothPicker === index) {
+    setActiveItemIndexForToothPicker(null);
+  };
+
+  const clearAllItems = () => {
+    if (window.confirm('Remove all added procedures from this invoice?')) {
+      setItems([]);
       setActiveItemIndexForToothPicker(null);
     }
   };
@@ -514,6 +519,17 @@ export const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({
                 <span className="w-2 h-2 rounded-full bg-teal-600"></span>
                 3. Billed Treatments ({items.length})
               </h2>
+
+              {items.length > 0 && (
+                <button
+                  type="button"
+                  onClick={clearAllItems}
+                  className="text-xs font-bold text-rose-600 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 px-3 py-1 rounded-lg border border-rose-200 transition-colors flex items-center gap-1 cursor-pointer"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Clear All Items</span>
+                </button>
+              )}
             </div>
 
             {items.length === 0 ? (
@@ -521,7 +537,7 @@ export const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({
                 <FileText className="w-8 h-8 text-slate-300 mx-auto" />
                 <p className="text-xs font-bold text-slate-600">No procedures added yet</p>
                 <p className="text-xs text-slate-400">
-                  Select treatments from the catalogue above to add them to this bill.
+                  Select treatments from the catalogue above to add them to this bill with custom manual pricing.
                 </p>
               </div>
             ) : (
@@ -557,7 +573,7 @@ export const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({
                               activeItemIndexForToothPicker === index ? null : index
                             );
                           }}
-                          className={`px-3 py-1 text-xs font-bold rounded-lg border transition-colors flex items-center gap-1.5 ${
+                          className={`px-3 py-1 text-xs font-bold rounded-lg border transition-colors flex items-center gap-1.5 cursor-pointer ${
                             activeItemIndexForToothPicker === index
                               ? 'bg-teal-600 text-white border-teal-700'
                               : 'bg-teal-50 text-teal-800 border-teal-200 hover:bg-teal-100'
@@ -572,10 +588,11 @@ export const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({
                         <button
                           type="button"
                           onClick={() => removeItem(index)}
-                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-                          title="Remove item"
+                          className="px-3 py-1 text-xs font-bold text-rose-700 hover:text-white bg-rose-50 hover:bg-rose-600 border border-rose-200 hover:border-rose-600 rounded-lg transition-all flex items-center gap-1 cursor-pointer shadow-xs"
+                          title="Remove this treatment from bill"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Delete</span>
                         </button>
                       </div>
                     </div>
