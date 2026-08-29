@@ -134,13 +134,13 @@ export const INITIAL_PROCEDURES: DentalProcedure[] = [
   { id: 'proc-15', code: 'D3330', name: 'Painless Rotary Microscope Root Canal Therapy (Molar Tooth)', category: 'Endodontics', defaultCost: 0, standardDurationMin: 75, isToothSpecific: true, taxRatePercent: 0, isActive: true, description: '3-4 canal complex molar RCT with thermal gutta-percha 3D hermetic sealing.' },
   { id: 'proc-16', code: 'D3346', name: 'Re-treatment of Previous Failed Root Canal', category: 'Endodontics', defaultCost: 0, standardDurationMin: 90, isToothSpecific: true, taxRatePercent: 0, isActive: true, description: 'Removal of old filling, ultrasonic disinfection, and resealing.' },
 
-  // Crowns & Prosthodontics
-  { id: 'proc-17', code: 'D2740', name: 'CAD/CAM Monolithic High-Translucent Zirconia Crown (15 Yr Warranty)', category: 'Prosthodontics', defaultCost: 0, standardDurationMin: 45, isToothSpecific: true, taxRatePercent: 0, isActive: true, description: 'Precision digitally milled unbreakable zirconia with warranty card.' },
-  { id: 'proc-18', code: 'D2750', name: 'Porcelain Fused to Metal (PFM) Ceramic Crown', category: 'Prosthodontics', defaultCost: 0, standardDurationMin: 45, isToothSpecific: true, taxRatePercent: 0, isActive: true, description: 'Standard high-strength ceramic crown.' },
+  // Crowns & Restorative
+  { id: 'proc-17', code: 'D2740', name: 'CAD/CAM Monolithic High-Translucent Zirconia Crown (15 Yr Warranty)', category: 'Restorative', defaultCost: 0, standardDurationMin: 45, isToothSpecific: true, taxRatePercent: 0, isActive: true, description: 'Precision digitally milled unbreakable zirconia with warranty card.' },
+  { id: 'proc-18', code: 'D2750', name: 'Porcelain Fused to Metal (PFM) Ceramic Crown', category: 'Restorative', defaultCost: 0, standardDurationMin: 45, isToothSpecific: true, taxRatePercent: 0, isActive: true, description: 'Standard high-strength ceramic crown.' },
   { id: 'proc-19', code: 'D2962', name: 'Cosmetic Porcelain Veneers & Smile Design (Per Unit)', category: 'Cosmetic', defaultCost: 0, standardDurationMin: 60, isToothSpecific: true, taxRatePercent: 0, isActive: true, description: 'Ultra-thin E-Max aesthetic ceramic veneer for gap closure and smile makeover.' },
-  { id: 'proc-20', code: 'D6010', name: 'Keyhole Titanium Dental Implant Fixture (Straumann / Osstem)', category: 'Prosthodontics', defaultCost: 0, standardDurationMin: 60, isToothSpecific: true, taxRatePercent: 0, isActive: true, description: 'Keyhole titanium implant placement under local anesthesia.' },
-  { id: 'proc-21', code: 'D6057', name: 'Custom Implant Abutment & Screw-Retained Ceramic Crown', category: 'Prosthodontics', defaultCost: 0, standardDurationMin: 45, isToothSpecific: true, taxRatePercent: 0, isActive: true, description: 'Final custom ceramic crown attachment & bite calibration.' },
-  { id: 'proc-22', code: 'D5110', name: 'Complete Acrylic Denture (Single Arch)', category: 'Prosthodontics', defaultCost: 0, standardDurationMin: 45, isToothSpecific: false, taxRatePercent: 0, isActive: true, description: 'Custom fabricated full dental arch replacement.' },
+  { id: 'proc-20', code: 'D6010', name: 'Keyhole Titanium Dental Implant Fixture (Straumann / Osstem)', category: 'Restorative', defaultCost: 0, standardDurationMin: 60, isToothSpecific: true, taxRatePercent: 0, isActive: true, description: 'Keyhole titanium implant placement under local anesthesia.' },
+  { id: 'proc-21', code: 'D6057', name: 'Custom Implant Abutment & Screw-Retained Ceramic Crown', category: 'Restorative', defaultCost: 0, standardDurationMin: 45, isToothSpecific: true, taxRatePercent: 0, isActive: true, description: 'Final custom ceramic crown attachment & bite calibration.' },
+  { id: 'proc-22', code: 'D5110', name: 'Complete Acrylic Denture (Single Arch)', category: 'Restorative', defaultCost: 0, standardDurationMin: 45, isToothSpecific: false, taxRatePercent: 0, isActive: true, description: 'Custom fabricated full dental arch replacement.' },
 
   // Oral Surgery
   { id: 'proc-23', code: 'D7140', name: 'Simple Extraction under Local Anaesthesia', category: 'Oral Surgery', defaultCost: 0, standardDurationMin: 30, isToothSpecific: true, taxRatePercent: 0, isActive: true, description: 'Painless atraumatic tooth removal.' },
@@ -299,7 +299,7 @@ export const INITIAL_INVOICES: Invoice[] = [
         procedureId: 'proc-17',
         procedureCode: 'D2740',
         procedureName: 'CAD/CAM Monolithic High-Translucent Zirconia Crown (15 Yr Warranty)',
-        category: 'Prosthodontics',
+        category: 'Restorative',
         toothNumbers: ['16 (FDI: 26)'],
         surface: 'Full Crown',
         quantity: 1,
@@ -371,7 +371,7 @@ export const INITIAL_INVOICES: Invoice[] = [
         procedureId: 'proc-20',
         procedureCode: 'D6010',
         procedureName: 'Keyhole Titanium Dental Implant Fixture (Straumann / Osstem)',
-        category: 'Prosthodontics',
+        category: 'Restorative',
         toothNumbers: ['19 (FDI: 36)'],
         surface: 'Bone Site',
         quantity: 1,
@@ -387,7 +387,7 @@ export const INITIAL_INVOICES: Invoice[] = [
         procedureId: 'proc-21',
         procedureCode: 'D6057',
         procedureName: 'Custom Implant Abutment & Screw-Retained Ceramic Crown',
-        category: 'Prosthodontics',
+        category: 'Restorative',
         toothNumbers: ['19 (FDI: 36)'],
         surface: 'Abutment',
         quantity: 1,

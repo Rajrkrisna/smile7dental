@@ -40,7 +40,6 @@ export const TreatmentCatalog: React.FC = () => {
     'Restorative',
     'Endodontics',
     'Periodontics',
-    'Prosthodontics',
     'Oral Surgery',
     'Orthodontics',
     'Pediatric',

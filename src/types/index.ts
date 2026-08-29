@@ -7,7 +7,6 @@ export type ProcedureCategory =
   | 'Restorative'
   | 'Endodontics'
   | 'Periodontics'
-  | 'Prosthodontics'
   | 'Oral Surgery'
   | 'Orthodontics'
   | 'Pediatric'
