@@ -23,7 +23,6 @@ export const InvoiceThermalPrint: React.FC<InvoiceThermalPrintProps> = ({ invoic
         <p className="text-[10px]">{clinic.addressLine1}</p>
         <p className="text-[10px]">{clinic.city}, {clinic.state} {clinic.zipCode}</p>
         <p className="text-[10px]">Tel: {clinic.phone}</p>
-        {clinic.taxId && <p className="text-[10px]">Tax ID: {clinic.taxId}</p>}
       </div>
 
       {/* Invoice & Patient Meta */}
@@ -63,8 +62,8 @@ export const InvoiceThermalPrint: React.FC<InvoiceThermalPrintProps> = ({ invoic
         ))}
       </div>
 
-      {/* Financial Summary */}
-      <div className="py-2 border-b border-dashed border-black space-y-1">
+      {/* Totals */}
+      <div className="py-2 border-b border-black space-y-1">
         <div className="flex justify-between">
           <span>Subtotal:</span>
           <span>{formatCurrency(invoice.subtotal, clinic.currencySymbol)}</span>
@@ -86,12 +85,6 @@ export const InvoiceThermalPrint: React.FC<InvoiceThermalPrintProps> = ({ invoic
                 clinic.currencySymbol
               )}
             </span>
-          </div>
-        )}
-        {invoice.totalTax > 0 && (
-          <div className="flex justify-between">
-            <span>Tax:</span>
-            <span>{formatCurrency(invoice.totalTax, clinic.currencySymbol)}</span>
           </div>
         )}
         <div className="flex justify-between text-xs font-bold pt-1 border-t border-black">
@@ -124,7 +117,7 @@ export const InvoiceThermalPrint: React.FC<InvoiceThermalPrintProps> = ({ invoic
       {/* Footer */}
       <div className="text-center pt-3 space-y-1 text-[10px]">
         <p className="font-bold">*** SMILE WITH CONFIDENCE ***</p>
-        <p>Thank you for visiting Smile7dental!</p>
+        <p>Thank you for visiting Smile7 Dental Clinic!</p>
         {invoice.nextAppointmentDate && (
           <p className="font-bold border border-black p-1 my-1">
             Next Visit: {formatDate(invoice.nextAppointmentDate)}

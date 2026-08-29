@@ -94,11 +94,11 @@ export const INITIAL_CLINIC_PROFILE: ClinicProfile = {
   invoicePrefix: 'S7D',
   invoiceFooterNote: 'Thank you for choosing Smile7 Dental Clinic. Please keep this invoice for warranty and medical records. For appointments or post-treatment queries, call +91 97908 62510.',
   bankDetails: {
-    accountName: 'Smile7 Dental Clinic - Dr. P. Manickapriya',
-    accountNumber: '389201948201',
-    ifscOrRouting: 'SBIN0012845',
-    bankName: 'State Bank of India, Maduravoyal Branch',
-    upiId: '9790862510@okaxis'
+    accountName: '',
+    accountNumber: '',
+    ifscOrRouting: '',
+    bankName: '',
+    upiId: ''
   }
 };
 

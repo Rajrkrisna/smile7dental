@@ -286,7 +286,7 @@ export const ClinicDashboard: React.FC<ClinicDashboardProps> = ({
             </div>
             <p className="text-slate-600"><span className="font-medium">Reg:</span> {clinicProfile.registrationNumber}</p>
             <p className="text-slate-600"><span className="font-medium">Council:</span> {clinicProfile.dentalCouncilNumber}</p>
-            <p className="text-slate-600"><span className="font-medium">GSTIN/Tax:</span> {clinicProfile.taxId}</p>
+            <p className="text-slate-600"><span className="font-medium">Location:</span> Maduravoyal, Chennai</p>
           </div>
         </div>
       </div>

@@ -116,7 +116,17 @@ export const DentalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed.dentistInCharge && !parsed.dentistInCharge.includes('Jenkins')) {
-          return parsed;
+          return {
+            ...parsed,
+            taxId: '',
+            bankDetails: {
+              accountName: '',
+              accountNumber: '',
+              ifscOrRouting: '',
+              bankName: '',
+              upiId: ''
+            }
+          };
         }
       }
     } catch {
@@ -204,7 +214,7 @@ export const DentalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     localStorage.setItem(STORAGE_KEYS.NOTATION, activeToothNotation);
   }, [activeToothNotation]);
 
-  // Ensure all procedure default costs are 0 across all sessions
+  // Ensure all procedure default costs are 0 and tax/bank details are clean across all sessions
   useEffect(() => {
     setProcedures(prev => {
       const hasNonZero = prev.some(p => p.defaultCost > 0);
@@ -213,6 +223,18 @@ export const DentalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
       return prev;
     });
+
+    setClinicProfile(prev => ({
+      ...prev,
+      taxId: '',
+      bankDetails: {
+        accountName: '',
+        accountNumber: '',
+        ifscOrRouting: '',
+        bankName: '',
+        upiId: ''
+      }
+    }));
   }, []);
 
   // Auth Operations
