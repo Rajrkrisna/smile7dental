@@ -215,9 +215,15 @@ export const TreatmentCatalog: React.FC = () => {
                 <span className="font-mono text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-md">
                   {proc.code}
                 </span>
-                <span className="text-base font-black text-slate-900">
-                  {formatCurrency(proc.defaultCost, clinicProfile.currencySymbol)}
-                </span>
+                {proc.defaultCost > 0 ? (
+                  <span className="text-base font-black text-slate-900">
+                    {formatCurrency(proc.defaultCost, clinicProfile.currencySymbol)}
+                  </span>
+                ) : (
+                  <span className="text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-md">
+                    Manual Fee
+                  </span>
+                )}
               </div>
 
               <h3 className="font-bold text-slate-900 text-sm mb-1">{proc.name}</h3>

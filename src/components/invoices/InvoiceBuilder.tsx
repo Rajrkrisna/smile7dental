@@ -99,12 +99,12 @@ export const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({
       toothNumbers: [],
       surface: '',
       quantity: 1,
-      unitPrice: proc.defaultCost,
+      unitPrice: proc.defaultCost || 0,
       discountType: 'fixed',
       discountValue: 0,
       taxPercent: proc.taxRatePercent || 0,
       notes: '',
-      lineTotal: proc.defaultCost
+      lineTotal: proc.defaultCost || 0
     };
 
     const nextItems = [...items, newItem];
@@ -488,8 +488,8 @@ export const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({
                       <span className="text-[10px] font-mono font-bold text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded">
                         {proc.code}
                       </span>
-                      <span className="text-xs font-black text-slate-900">
-                        {formatCurrency(proc.defaultCost, clinicProfile.currencySymbol)}
+                      <span className="text-[10px] font-bold text-teal-800 bg-teal-50/80 border border-teal-200 px-2 py-0.5 rounded-md group-hover:bg-teal-100 transition-colors">
+                        ₹ Enter Amount
                       </span>
                     </div>
                     <p className="text-xs font-semibold text-slate-800 line-clamp-2 mt-1">
@@ -499,7 +499,7 @@ export const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({
                   <div className="flex justify-between items-center text-[10px] text-slate-400 mt-2">
                     <span>{proc.category}</span>
                     <span className="text-teal-600 font-bold group-hover:translate-x-0.5 transition-transform">
-                      + Add
+                      + Add to Bill
                     </span>
                   </div>
                 </button>
@@ -618,14 +618,17 @@ export const InvoiceBuilder: React.FC<InvoiceBuilderProps> = ({
                       </div>
 
                       <div>
-                        <label className="font-semibold text-slate-600 block mb-1">Unit Price ({clinicProfile.currencySymbol})</label>
+                        <label className="font-bold text-amber-900 block mb-1">
+                          Amount / Rate ({clinicProfile.currencySymbol})
+                        </label>
                         <input
                           type="number"
                           min="0"
                           step="any"
-                          value={item.unitPrice}
+                          placeholder="Enter fee (₹)..."
+                          value={item.unitPrice === 0 ? '' : item.unitPrice}
                           onChange={(e) => updateItem(index, { unitPrice: parseFloat(e.target.value) || 0 })}
-                          className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 font-bold focus:bg-white focus:outline-none focus:ring-1 focus:ring-teal-500"
+                          className="w-full px-2.5 py-1.5 bg-amber-50/70 border-2 border-amber-300 focus:border-teal-500 rounded-lg text-slate-900 font-black text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20"
                         />
                       </div>
 
