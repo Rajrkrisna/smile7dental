@@ -9,8 +9,6 @@ import { FooterSection } from '../sections/FooterSection';
 import { BookingModal } from '../sections/BookingModal';
 import { ServiceDetailModal } from '../sections/ServiceDetailModal';
 import type { ServiceData } from '../sections/ServiceDetailModal';
-import { AudioAmbience } from '../ui/AudioAmbience';
-
 interface MainClinicWebsiteProps {
   onOpenBillingPortal: () => void;
 }
@@ -51,9 +49,6 @@ export const MainClinicWebsite: React.FC<MainClinicWebsiteProps> = ({ onOpenBill
 
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-[#bae6fd] selection:text-[#00264d]">
-      {/* Ambient Sound / Sensory experience */}
-      <AudioAmbience />
-
       {/* Apple-style Glass Navigation Bar */}
       <Navbar 
         onOpenBooking={handleOpenGeneralBooking} 
