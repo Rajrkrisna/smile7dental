@@ -1,0 +1,18 @@
+# Smile7 Dental Clinic
+
+> Precision dental care, redefined for comfort. A dental clinic in Maduravoyal, Chennai, led by Dr. P. Manickapriya (BDS, FCD).
+
+This file describes the public clinic website. It is not a billing or practice-management system.
+
+## Contact
+
+- Phone: +91 97908 62510
+- Email: care@smile7dental.com
+- Address: No. 1/2, Alapakkam Main Road, Janaki Nagar, Maduravoyal, Chennai, Tamil Nadu 600095
+- Hours: Monday–Saturday 9:30 AM–8:00 PM. Sunday by prior appointment.
+- Map: https://maps.google.com/?q=Smile+7+Dental+Clinic+Maduravoyal+Chennai
+
+## Pages
+
+- [Clinic overview](https://smile7dental.com/index.md): doctor, treatments, hours, and how to book
+- [Website](https://smile7dental.com/): the public homepage
