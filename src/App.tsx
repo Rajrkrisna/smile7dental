@@ -15,6 +15,7 @@ import { ClinicSettings } from './components/settings/ClinicSettings';
 import { AdminLogin } from './components/auth/AdminLogin';
 import { InstantInvoiceDownloader } from './components/patient-portal/InstantInvoiceDownloader';
 import { MainClinicWebsite } from './components/website/MainClinicWebsite';
+import { InstallAppModal } from './components/mobile/InstallAppModal';
 import { decodeInvoicePayload, parseInvoiceFromQueryParams } from './utils/shareUtils';
 import type { Invoice, ClinicProfile } from './types';
 
@@ -55,6 +56,7 @@ const DentalAppContent: React.FC = () => {
   
   const [viewPatientId, setViewPatientId] = useState<string | null>(null);
   const [isAddPatientOpen, setIsAddPatientOpen] = useState<boolean>(false);
+  const [isInstallModalOpen, setIsInstallModalOpen] = useState<boolean>(false);
   const [invoicePreselectedPatientId, setInvoicePreselectedPatientId] = useState<string | undefined>(undefined);
 
   // Handlers
@@ -93,6 +95,7 @@ const DentalAppContent: React.FC = () => {
       {/* Top Navigation Bar */}
       <Navbar
         onOpenCreateInvoice={() => handleOpenCreateInvoice()}
+        onOpenInstallApp={() => setIsInstallModalOpen(true)}
         activeTab={activeTab}
       />
 
@@ -106,6 +109,7 @@ const DentalAppContent: React.FC = () => {
             setInvoicePreselectedPatientId(undefined);
           }}
           onOpenCreateInvoice={() => handleOpenCreateInvoice()}
+          onOpenInstallApp={() => setIsInstallModalOpen(true)}
         />
 
         {/* Content Area */}
@@ -204,6 +208,13 @@ const DentalAppContent: React.FC = () => {
               setInvoicePreselectedPatientId(newPat.id);
             }
           }}
+        />
+      )}
+
+      {/* Mobile App Install Modal (Android & iOS) */}
+      {isInstallModalOpen && (
+        <InstallAppModal
+          onClose={() => setIsInstallModalOpen(false)}
         />
       )}
     </div>

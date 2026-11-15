@@ -7,19 +7,22 @@ import {
   Stethoscope, 
   CreditCard, 
   Settings,
-  Plus
+  Plus,
+  Smartphone
 } from 'lucide-react';
 
 interface SidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   onOpenCreateInvoice: () => void;
+  onOpenInstallApp?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   onTabChange,
-  onOpenCreateInvoice
+  onOpenCreateInvoice,
+  onOpenInstallApp
 }) => {
   const { invoices, patients, stats } = useDental();
 
@@ -79,6 +82,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
           );
         })}
       </nav>
+
+      {/* Mobile App Install Widget */}
+      {onOpenInstallApp && (
+        <div className="hidden md:block bg-gradient-to-br from-sky-50 to-teal-50 border border-sky-200/80 rounded-2xl p-4 text-xs space-y-2 shadow-2xs">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-[#004884] text-white flex items-center justify-center shrink-0">
+              <Smartphone className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="font-extrabold text-[#002244] block text-xs">Mobile App</span>
+              <span className="text-[10px] text-slate-500 font-medium">Android &amp; iPhone</span>
+            </div>
+          </div>
+          <p className="text-[11px] text-slate-600 leading-snug">
+            Install Smile7 directly on your phone to bill and track patients on the go.
+          </p>
+          <button
+            type="button"
+            onClick={onOpenInstallApp}
+            className="w-full py-2 px-3 rounded-xl bg-white hover:bg-slate-50 text-[#004884] border border-sky-300 font-bold text-xs flex items-center justify-center gap-1.5 shadow-2xs transition-all cursor-pointer"
+          >
+            <span>Install on Phone</span>
+          </button>
+        </div>
+      )}
 
       {/* Pending Due Alert Widget */}
       {stats.totalPendingDues > 0 && (

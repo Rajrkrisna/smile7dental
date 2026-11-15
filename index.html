@@ -4,10 +4,18 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/favicon.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Smile7 Dental Clinic | Maduravoyal, Chennai</title>
     <meta name="description" content="Precision dental care, redefined for comfort. Smile7 Dental Clinic in Maduravoyal, Chennai, led by Dr. P. Manickapriya (BDS)." />
     <meta name="theme-color" content="#004884" />
+    
+    <!-- Mobile App (PWA) Capability for Android & iOS -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Smile7 Dental" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png" />
     <link rel="canonical" href="https://smile7dental.com/" />
     <link rel="alternate" type="text/markdown" href="https://smile7dental.com/index.md" title="Smile7 Dental Clinic in Markdown" />
     <link rel="alternate" type="text/plain" href="https://smile7dental.com/llms.txt" title="llms.txt" />
@@ -48,5 +56,12 @@
   <body class="bg-slate-50 text-slate-900 antialiased selection:bg-teal-100 selection:text-teal-900">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js').catch(function() {});
+        });
+      }
+    </script>
   </body>
 </html>

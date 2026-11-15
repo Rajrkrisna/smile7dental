@@ -1,14 +1,15 @@
 import React from 'react';
 import { useDental } from '../../context/DentalContext';
-import { Plus, Lock, Globe, ShieldCheck } from 'lucide-react';
+import { Plus, Lock, Globe, ShieldCheck, Smartphone } from 'lucide-react';
 import logoIcon from '../../assets/smile7-logo-icon.png';
 
 interface NavbarProps {
   onOpenCreateInvoice: () => void;
+  onOpenInstallApp?: () => void;
   activeTab: string;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenCreateInvoice }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenCreateInvoice, onOpenInstallApp }) => {
   const { 
     clinicProfile, 
     activeToothNotation, 
@@ -81,6 +82,19 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCreateInvoice }) => {
               Universal (#)
             </button>
           </div>
+
+          {/* Install Mobile App Button */}
+          {onOpenInstallApp && (
+            <button
+              type="button"
+              onClick={onOpenInstallApp}
+              className="px-3 py-2 text-xs font-bold text-[#004884] bg-sky-50 hover:bg-sky-100 border border-sky-200/80 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
+              title="Install Smile7 Mobile App on Android or iPhone"
+            >
+              <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
+              <span className="hidden md:inline">Install App</span>
+            </button>
+          )}
 
           {/* Quick Invoice Trigger */}
           <button
