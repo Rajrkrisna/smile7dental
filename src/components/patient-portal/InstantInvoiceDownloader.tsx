@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import type { Invoice, ClinicProfile } from '../../types';
-import { formatCurrency, formatDate } from '../../utils/formatters';
-import { downloadStandaloneInvoiceFile } from '../../utils/printUtils';
-import logoIcon from '../../assets/smile7-logo-icon.png';
-import logoText from '../../assets/smile7-logo-text.jpg';
+import { InvoiceA4Print } from '../invoices/InvoiceA4Print';
 import { 
   Download, 
-  ShieldCheck
+  Printer, 
+  Phone, 
+  ShieldCheck 
 } from 'lucide-react';
 
 interface InstantInvoiceDownloaderProps {
@@ -19,109 +18,87 @@ export const InstantInvoiceDownloader: React.FC<InstantInvoiceDownloaderProps> =
   clinic
 }) => {
   const [downloadTriggered, setDownloadTriggered] = useState(false);
-  const [downloadCount, setDownloadCount] = useState(0);
 
-  const performDirectDownload = () => {
-    downloadStandaloneInvoiceFile(invoice, clinic);
+  const handleDownloadPdf = () => {
+    const prevTitle = document.title;
+    document.title = `Smile7Dental_Invoice_${invoice.invoiceNumber}_${invoice.patientName.replace(/\s+/g, '_')}`;
     setDownloadTriggered(true);
-    setDownloadCount(prev => prev + 1);
+    window.print();
+    setTimeout(() => {
+      document.title = prevTitle;
+    }, 1500);
   };
 
-  // Automatically trigger the file download on mount
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      performDirectDownload();
-    }, 400);
-
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 sm:p-6 text-slate-100 font-sans select-none">
-      {/* Background glow */}
-      <div className="absolute -top-32 -left-32 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute -bottom-32 -right-32 w-80 h-80 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div className="min-h-screen bg-slate-100 font-sans text-slate-900 pb-16">
+      {/* Top Patient Floating Action Bar (Hidden when printing) */}
+      <header className="no-print sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs px-4 py-3">
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-teal-50 border border-teal-200 flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-4 h-4 text-teal-700" />
+            </div>
+            <div>
+              <span className="font-extrabold text-xs text-slate-900 block leading-tight">
+                {clinic.name} • Official Invoice #{invoice.invoiceNumber}
+              </span>
+              <span className="text-[11px] font-bold text-teal-700">
+                {clinic.tagline || 'Prevent Now! Smile Forever!'}
+              </span>
+            </div>
+          </div>
 
-      {/* Main Download Card */}
-      <div className="relative z-10 w-full max-w-md bg-slate-900/95 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl text-center space-y-6">
-        
-        {/* Clinic Logo */}
-        <div className="bg-white p-3 rounded-2xl inline-flex items-center justify-center gap-2 shadow-lg mx-auto">
-          <img 
-            src={logoIcon} 
-            alt="Smile7 Icon" 
-            className="h-9 w-auto object-contain"
-          />
-          <img 
-            src={logoText} 
-            alt="Smile7 Dental Clinic" 
-            className="h-7 w-auto object-contain"
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <a
+              href={`tel:${clinic.phone.replace(/\s+/g, '')}`}
+              className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="Call Clinic"
+            >
+              <Phone className="w-3.5 h-3.5 text-slate-500" />
+              <span className="hidden sm:inline">Call Clinic</span>
+            </a>
+
+            <button
+              type="button"
+              onClick={handleDownloadPdf}
+              className="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 active:scale-98 text-white font-black text-xs flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
+              title="Download or save official PDF invoice in 1 click"
+            >
+              <Download className="w-4 h-4 animate-bounce" />
+              <span>{downloadTriggered ? 'Saved! Download PDF Again' : 'Download PDF (1-Click)'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleDownloadPdf}
+              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer hidden md:flex"
+              title="Print Receipt"
+            >
+              <Printer className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Document Viewport */}
+      <main className="max-w-4xl mx-auto p-2 sm:p-6 mt-2">
+        <div className="bg-white rounded-2xl shadow-xl border border-slate-200/80 overflow-hidden">
+          <InvoiceA4Print 
+            invoice={invoice} 
+            clinic={clinic} 
           />
         </div>
 
-        {/* Status Indicator */}
-        <div className="space-y-2">
-          <div className="w-14 h-14 rounded-full bg-teal-500/20 text-teal-400 border border-teal-500/30 flex items-center justify-center mx-auto animate-bounce">
-            <Download className="w-7 h-7" />
-          </div>
-          
-          <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-            {downloadTriggered ? 'Invoice Downloaded' : 'Downloading Invoice...'}
-          </h1>
-          
-          <p className="text-xs text-slate-400">
-            Official dental receipt generated for <strong className="text-white">{invoice.patientName}</strong>
+        {/* Bottom Helper Bar on Mobile */}
+        <div className="no-print mt-4 text-center space-y-2">
+          <p className="text-xs text-slate-500">
+            Tap <strong>Download PDF (1-Click)</strong> above to save this dental receipt directly to your smartphone or computer.
+          </p>
+          <p className="text-[11px] text-slate-400 font-mono">
+            {clinic.name} • {clinic.addressLine1}, {clinic.city} • Ph: {clinic.phone}
           </p>
         </div>
-
-        {/* Invoice Summary Pill */}
-        <div className="bg-slate-950/80 border border-slate-800/80 rounded-2xl p-4 text-left space-y-2 text-xs">
-          <div className="flex justify-between items-center text-slate-400">
-            <span>Invoice Number:</span>
-            <span className="font-mono font-bold text-teal-400">#{invoice.invoiceNumber}</span>
-          </div>
-          <div className="flex justify-between items-center text-slate-400">
-            <span>Treatment Date:</span>
-            <span className="font-medium text-slate-200">{formatDate(invoice.date)}</span>
-          </div>
-          <div className="flex justify-between items-center text-slate-400">
-            <span>Total Bill:</span>
-            <span className="font-bold text-white text-sm">{formatCurrency(invoice.grandTotal, clinic.currencySymbol)}</span>
-          </div>
-          <div className="flex justify-between items-center pt-2 border-t border-slate-800/60">
-            <span>Payment Status:</span>
-            <span className={`font-black uppercase text-[11px] px-2 py-0.5 rounded-full ${
-              invoice.balanceDue === 0 
-                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' 
-                : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-            }`}>
-              {invoice.balanceDue === 0 ? 'Paid in Full' : `Due: ${formatCurrency(invoice.balanceDue, clinic.currencySymbol)}`}
-            </span>
-          </div>
-        </div>
-
-        {/* Download Actions */}
-        <div className="space-y-3 pt-1">
-          <button
-            type="button"
-            onClick={performDirectDownload}
-            className="w-full py-3.5 bg-linear-to-r from-teal-600 to-teal-700 hover:from-teal-500 hover:to-teal-600 active:scale-98 text-white font-bold rounded-xl shadow-lg shadow-teal-900/40 flex items-center justify-center gap-2 text-xs uppercase tracking-wider transition-all cursor-pointer"
-          >
-            <Download className="w-4 h-4" />
-            <span>{downloadCount > 1 ? 'Download Again' : 'Click to Download Invoice'}</span>
-          </button>
-
-          <p className="text-[11px] text-slate-500">
-            The file has been saved to your device's <strong>Downloads</strong> folder. Open it anytime to print or save as PDF.
-          </p>
-        </div>
-
-        {/* Clinic Verification Footer */}
-        <div className="pt-4 border-t border-slate-800/60 text-[10px] text-slate-500 flex items-center justify-center gap-1.5">
-          <ShieldCheck className="w-3.5 h-3.5 text-teal-500" />
-          <span>Verified Healthcare Record • Smile7 Dental Clinic, Chennai</span>
-        </div>
-      </div>
+      </main>
     </div>
   );
 };
