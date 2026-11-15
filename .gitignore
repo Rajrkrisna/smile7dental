@@ -19,6 +19,7 @@ dist-ssr/
 # Binaries
 *.exe
 *.dll
+*.apk
 
 # Android build outputs & caches
 android/.gradle/

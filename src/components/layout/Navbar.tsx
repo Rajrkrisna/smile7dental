@@ -5,7 +5,9 @@ import {
   Calendar, 
   Users, 
   ShieldCheck,
-  Globe
+  Globe,
+  Cloud,
+  RefreshCw
 } from 'lucide-react';
 import logoIcon from '../../assets/smile7-logo-icon.png';
 
@@ -19,9 +21,18 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({
   onOpenNewPatient,
   onOpenNewAppointment,
-  onOpenNewInvoice
+  onOpenNewInvoice,
+  onNavigateTab
 }) => {
-  const { clinicProfile, notation, setNotation } = useClinic();
+  const { 
+    clinicProfile, 
+    notation, 
+    setNotation,
+    syncConfig,
+    syncStatus,
+    lastSyncTime,
+    triggerSync
+  } = useClinic();
 
   return (
     <header className="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 px-4 sm:px-6 py-2.5 transition-all">
@@ -91,6 +102,55 @@ export const Navbar: React.FC<NavbarProps> = ({
               Palmer ┘└
             </button>
           </div>
+
+          {/* GitHub Cloud Database Sync Status */}
+          <button
+            type="button"
+            onClick={() => {
+              if (!syncConfig.token) {
+                onNavigateTab('settings');
+              } else {
+                triggerSync('bidirectional');
+              }
+            }}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+              syncStatus === 'syncing'
+                ? 'bg-amber-50 text-amber-700 border-amber-200'
+                : syncStatus === 'success'
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                : syncStatus === 'error'
+                ? 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100'
+                : syncConfig.token
+                ? 'bg-sky-50 text-[#004884] border-sky-200 hover:bg-sky-100'
+                : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
+            }`}
+            title={
+              !syncConfig.token
+                ? 'Click to connect GitHub Cloud Database in Settings'
+                : syncStatus === 'syncing'
+                ? 'Syncing with GitHub database...'
+                : syncStatus === 'error'
+                ? 'Sync error. Click to retry sync'
+                : `Synced with GitHub at ${lastSyncTime || 'recently'}. Click to sync now.`
+            }
+          >
+            {syncStatus === 'syncing' ? (
+              <RefreshCw className="w-3.5 h-3.5 text-amber-600 animate-spin" />
+            ) : (
+              <Cloud className={`w-3.5 h-3.5 ${syncStatus === 'success' ? 'text-emerald-600' : syncStatus === 'error' ? 'text-rose-600' : 'text-[#004884]'}`} />
+            )}
+            <span className="hidden sm:inline">
+              {!syncConfig.token 
+                ? 'Connect Cloud' 
+                : syncStatus === 'syncing' 
+                ? 'Syncing...' 
+                : syncStatus === 'error'
+                ? 'Sync Error'
+                : lastSyncTime
+                ? `Synced ${lastSyncTime}`
+                : 'Synced'}
+            </span>
+          </button>
 
           {/* Quick Register Patient */}
           <button

@@ -29,12 +29,28 @@ import {
   INITIAL_VISITS
 } from '../data/initialData';
 import { arePhonesEqual } from '../utils/phone';
+import { 
+  getSyncConfig, 
+  saveSyncConfig, 
+  fetchFromGitHub, 
+  pushToGitHub, 
+  mergeDatabases,
+  type GitHubSyncConfig 
+} from '../utils/githubSync';
 
 interface ClinicContextType {
   clinicProfile: ClinicProfile;
   updateClinicProfile: (profile: ClinicProfile) => void;
   notation: ToothNotation;
   setNotation: (notation: ToothNotation) => void;
+
+  // GitHub Cloud Sync
+  syncConfig: GitHubSyncConfig;
+  syncStatus: 'idle' | 'syncing' | 'success' | 'error';
+  lastSyncTime: string | null;
+  lastSyncError: string | null;
+  updateSyncConfig: (config: Partial<GitHubSyncConfig>) => void;
+  triggerSync: (direction?: 'bidirectional' | 'push' | 'pull') => Promise<{ success: boolean; message: string }>;
   
   // Patients
   patients: Patient[];
@@ -670,6 +686,120 @@ export const ClinicProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setPatientVisits(INITIAL_VISITS);
   };
 
+  // GitHub Cloud Database Sync State
+  const [syncConfig, setSyncConfigState] = useState<GitHubSyncConfig>(() => getSyncConfig());
+  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'success' | 'error'>(syncConfig.lastSyncStatus || 'idle');
+  const [lastSyncTime, setLastSyncTime] = useState<string | null>(syncConfig.lastSyncTime || null);
+  const [lastSyncError, setLastSyncError] = useState<string | null>(syncConfig.lastError || null);
+
+  const updateSyncConfig = (newConfig: Partial<GitHubSyncConfig>) => {
+    const updated = saveSyncConfig(newConfig);
+    setSyncConfigState(updated);
+  };
+
+  const triggerSync = async (direction: 'bidirectional' | 'push' | 'pull' = 'bidirectional'): Promise<{ success: boolean; message: string }> => {
+    if (!syncConfig.token) {
+      return { success: false, message: 'GitHub token not configured. Please enter your token in Settings.' };
+    }
+
+    setSyncStatus('syncing');
+    setLastSyncError(null);
+
+    try {
+      const localData = {
+        version: '1.0.0',
+        exportedAt: new Date().toISOString(),
+        clinicProfile,
+        notation,
+        patients,
+        appointments,
+        clinicalNotes,
+        prescriptions,
+        invoices,
+        procedures,
+        consultantPayouts,
+        labWorkOrders,
+        generalExpenses,
+        patientVisits
+      };
+
+      if (direction === 'push') {
+        // Direct Push
+        await pushToGitHub(JSON.stringify(localData, null, 2), syncConfig, 'sync: manual push from local database');
+        const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        setSyncStatus('success');
+        setLastSyncTime(now);
+        updateSyncConfig({ lastSyncStatus: 'success', lastSyncTime: now, lastError: undefined });
+        return { success: true, message: 'Local database uploaded to GitHub successfully!' };
+      }
+
+      // Fetch remote database
+      const remote = await fetchFromGitHub(syncConfig);
+
+      if (direction === 'pull') {
+        // Direct Pull
+        if (!remote.exists || !remote.data) {
+          throw new Error('Remote database file does not exist on GitHub yet.');
+        }
+        importDatabase(remote.rawJson || JSON.stringify(remote.data));
+        const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        setSyncStatus('success');
+        setLastSyncTime(now);
+        updateSyncConfig({ lastSyncStatus: 'success', lastSyncTime: now, lastError: undefined });
+        return { success: true, message: 'Database refreshed from GitHub!' };
+      }
+
+      // Bidirectional Smart Merge
+      if (!remote.exists || !remote.data) {
+        // Initialize remote database on GitHub
+        await pushToGitHub(JSON.stringify(localData, null, 2), syncConfig, 'init: initialize clinic database on GitHub');
+        const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        setSyncStatus('success');
+        setLastSyncTime(now);
+        updateSyncConfig({ lastSyncStatus: 'success', lastSyncTime: now, lastError: undefined });
+        return { success: true, message: 'GitHub database initialized with local records!' };
+      }
+
+      // Merge local with remote
+      const merged = mergeDatabases(localData, remote.data);
+      importDatabase(JSON.stringify(merged));
+
+      // Push merged copy back to GitHub so both mobile and laptop are in parity
+      await pushToGitHub(JSON.stringify(merged, null, 2), syncConfig, 'sync: merged clinic database update');
+
+      const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      setSyncStatus('success');
+      setLastSyncTime(now);
+      updateSyncConfig({ lastSyncStatus: 'success', lastSyncTime: now, lastError: undefined });
+      return { success: true, message: 'Synced seamlessly with GitHub! All records up to date.' };
+    } catch (err: any) {
+      console.error('GitHub Sync Error:', err);
+      const errMsg = err.message || 'Failed to sync with GitHub';
+      setSyncStatus('error');
+      setLastSyncError(errMsg);
+      updateSyncConfig({ lastSyncStatus: 'error', lastError: errMsg });
+      return { success: false, message: errMsg };
+    }
+  };
+
+  // Background auto-sync (on startup and periodic)
+  useEffect(() => {
+    if (!syncConfig.token || !syncConfig.autoSync) return;
+
+    const initialTimer = setTimeout(() => {
+      triggerSync('bidirectional');
+    }, 2500);
+
+    const interval = setInterval(() => {
+      triggerSync('bidirectional');
+    }, 180000);
+
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(interval);
+    };
+  }, [syncConfig.token, syncConfig.autoSync]);
+
   return (
     <ClinicContext.Provider
       value={{
@@ -677,6 +807,12 @@ export const ClinicProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         updateClinicProfile,
         notation,
         setNotation,
+        syncConfig,
+        syncStatus,
+        lastSyncTime,
+        lastSyncError,
+        updateSyncConfig,
+        triggerSync,
         patients,
         addPatient,
         updatePatient,
