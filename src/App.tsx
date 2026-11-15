@@ -63,7 +63,7 @@ const DentalAppMain: React.FC = () => {
       />
 
       {/* Main Workspace Frame */}
-      <main className="max-w-7xl mx-auto w-full px-4 sm:px-6 py-6 flex-1 flex flex-col md:flex-row gap-6">
+      <main className="max-w-7xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-6 flex-1 flex flex-col md:flex-row gap-4 sm:gap-6">
         {/* Navigation Sidebar */}
         <Sidebar
           activeTab={activeTab}

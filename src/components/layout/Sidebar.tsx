@@ -55,7 +55,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               key={item.id}
               type="button"
               onClick={() => onTabChange(item.id)}
-              className={`flex items-center justify-between p-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap md:w-full cursor-pointer ${
+              className={`flex items-center justify-between p-2.5 sm:p-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap md:w-full cursor-pointer shrink-0 ${
                 isActive
                   ? 'bg-sky-50 text-[#004884] border border-sky-200/80 shadow-2xs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'

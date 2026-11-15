@@ -129,26 +129,26 @@ export const PatientDirectory: React.FC<PatientDirectoryProps> = ({
             >
               <div>
                 <div className="flex items-start justify-between gap-2">
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">
+                      <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 shrink-0">
                         {patient.patientId}
                       </span>
                       {patientVisits.length > 0 && (
-                        <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-sky-50 text-[#004884] border border-sky-200 flex items-center gap-1">
+                        <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-sky-50 text-[#004884] border border-sky-200 flex items-center gap-1 shrink-0">
                           <Clock className="w-2.5 h-2.5" />
                           <span>{patientVisits.length} {patientVisits.length === 1 ? 'Sitting' : 'Sittings'}</span>
                         </span>
                       )}
                     </div>
-                    <h3 className="font-extrabold text-base text-slate-900 mt-1 group-hover:text-[#004884] transition-colors">
+                    <h3 className="font-extrabold text-base text-slate-900 mt-1 group-hover:text-[#004884] transition-colors break-words">
                       {patient.name}
                     </h3>
                     <p className="text-xs text-slate-500">
                       {patient.age} Yrs • {patient.gender} • Blood Group {patient.bloodGroup || 'N/A'}
                     </p>
                     {patient.address && (
-                      <p className="text-[11px] font-bold text-sky-800 flex items-center gap-1 mt-1">
+                      <p className="text-[11px] font-bold text-sky-800 flex items-center gap-1 mt-1 truncate">
                         <MapPin className="w-3 h-3 text-[#004884] shrink-0" />
                         <span className="truncate">{patient.address}</span>
                       </p>
@@ -156,14 +156,14 @@ export const PatientDirectory: React.FC<PatientDirectoryProps> = ({
                   </div>
 
                   {patient.balanceDue > 0 && (
-                    <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                    <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 shrink-0">
                       Due: {clinicProfile.currencySymbol}{patient.balanceDue}
                     </span>
                   )}
                 </div>
 
                 {/* Phone Contact & WhatsApp */}
-                <div className="flex items-center justify-between text-xs text-slate-600 mt-2.5">
+                <div className="flex items-center justify-between gap-2 text-xs text-slate-600 mt-2.5">
                   <div className="flex items-center gap-1.5 font-mono text-[11px]">
                     <Phone className="w-3.5 h-3.5 text-slate-400" />
                     <span>{patient.phone}</span>

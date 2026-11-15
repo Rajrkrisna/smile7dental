@@ -246,110 +246,116 @@ export const Odontogram: React.FC<OdontogramProps> = ({
 
       {/* The Graphical Mouth Grid (Maxillary & Mandibular Arches) */}
       <div className="relative overflow-x-auto py-2">
-        {/* Upper Arch (Maxilla) */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 px-2 uppercase tracking-wider">
-            <span>Upper Right (UR / Quad 1)</span>
-            <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-600 font-extrabold text-[10px]">
-              MAXILLARY ARCH
-            </span>
-            <span>Upper Left (UL / Quad 2)</span>
-          </div>
-
-          <div className="flex items-center justify-center gap-6 min-w-[700px]">
-            {/* UR Quadrant */}
-            <div className="flex items-center gap-1.5 justify-end flex-1">
-              {upperRight.map(tooth => (
-                <ToothVisual
-                  key={tooth.fdi}
-                  tooth={tooth}
-                  finding={chartFindings[String(tooth.fdi)]}
-                  notation={activeNotation}
-                  isPediatric={dentition === 'pediatric'}
-                  isSelected={selectedTooth?.fdi === tooth.fdi}
-                  onClick={handleToothClick}
-                />
-              ))}
-            </div>
-
-            {/* Anatomical Midline */}
-            <div className="w-0.5 h-20 bg-sky-400/60 relative flex items-center justify-center">
-              <span className="absolute -top-3 text-[9px] font-black text-[#004884] uppercase tracking-widest">
-                Midline
-              </span>
-            </div>
-
-            {/* UL Quadrant */}
-            <div className="flex items-center gap-1.5 justify-start flex-1">
-              {upperLeft.map(tooth => (
-                <ToothVisual
-                  key={tooth.fdi}
-                  tooth={tooth}
-                  finding={chartFindings[String(tooth.fdi)]}
-                  notation={activeNotation}
-                  isPediatric={dentition === 'pediatric'}
-                  isSelected={selectedTooth?.fdi === tooth.fdi}
-                  onClick={handleToothClick}
-                />
-              ))}
-            </div>
-          </div>
+        <div className="sm:hidden text-center pb-2 text-[10px] text-slate-400 font-medium">
+          ↔ Slide horizontally to inspect full dental arch
         </div>
 
-        {/* Arch Divider Gap */}
-        <div className="my-6 border-b border-dashed border-slate-200 relative">
-          <span className="absolute left-1/2 -top-2.5 -translate-x-1/2 bg-white px-3 text-[10px] font-bold text-slate-400 tracking-wider">
-            OCCLUSAL PLANE
-          </span>
-        </div>
-
-        {/* Lower Arch (Mandible) */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-center gap-6 min-w-[700px]">
-            {/* LR Quadrant */}
-            <div className="flex items-center gap-1.5 justify-end flex-1">
-              {lowerRight.map(tooth => (
-                <ToothVisual
-                  key={tooth.fdi}
-                  tooth={tooth}
-                  finding={chartFindings[String(tooth.fdi)]}
-                  notation={activeNotation}
-                  isPediatric={dentition === 'pediatric'}
-                  isSelected={selectedTooth?.fdi === tooth.fdi}
-                  onClick={handleToothClick}
-                />
-              ))}
-            </div>
-
-            {/* Anatomical Midline */}
-            <div className="w-0.5 h-20 bg-sky-400/60 relative flex items-center justify-center">
-              <span className="absolute -bottom-3 text-[9px] font-black text-[#004884] uppercase tracking-widest">
-                Midline
+        <div className="min-w-[760px] mx-auto space-y-3 px-2">
+          {/* Upper Arch (Maxilla) */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 px-2 uppercase tracking-wider">
+              <span>Upper Right (UR / Quad 1)</span>
+              <span className="bg-slate-100 px-2.5 py-0.5 rounded text-slate-600 font-extrabold text-[10px]">
+                MAXILLARY ARCH
               </span>
+              <span>Upper Left (UL / Quad 2)</span>
             </div>
 
-            {/* LL Quadrant */}
-            <div className="flex items-center gap-1.5 justify-start flex-1">
-              {lowerLeft.map(tooth => (
-                <ToothVisual
-                  key={tooth.fdi}
-                  tooth={tooth}
-                  finding={chartFindings[String(tooth.fdi)]}
-                  notation={activeNotation}
-                  isPediatric={dentition === 'pediatric'}
-                  isSelected={selectedTooth?.fdi === tooth.fdi}
-                  onClick={handleToothClick}
-                />
-              ))}
+            <div className="flex items-center justify-center gap-6">
+              {/* UR Quadrant */}
+              <div className="flex items-center gap-1.5 justify-end flex-1">
+                {upperRight.map(tooth => (
+                  <ToothVisual
+                    key={tooth.fdi}
+                    tooth={tooth}
+                    finding={chartFindings[String(tooth.fdi)]}
+                    notation={activeNotation}
+                    isPediatric={dentition === 'pediatric'}
+                    isSelected={selectedTooth?.fdi === tooth.fdi}
+                    onClick={handleToothClick}
+                  />
+                ))}
+              </div>
+
+              {/* Anatomical Midline */}
+              <div className="w-0.5 h-20 bg-sky-400/60 relative flex items-center justify-center">
+                <span className="absolute -top-3 text-[9px] font-black text-[#004884] uppercase tracking-widest">
+                  Midline
+                </span>
+              </div>
+
+              {/* UL Quadrant */}
+              <div className="flex items-center gap-1.5 justify-start flex-1">
+                {upperLeft.map(tooth => (
+                  <ToothVisual
+                    key={tooth.fdi}
+                    tooth={tooth}
+                    finding={chartFindings[String(tooth.fdi)]}
+                    notation={activeNotation}
+                    isPediatric={dentition === 'pediatric'}
+                    isSelected={selectedTooth?.fdi === tooth.fdi}
+                    onClick={handleToothClick}
+                  />
+                ))}
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 px-2 uppercase tracking-wider pt-2">
-            <span>Lower Right (LR / Quad 4)</span>
-            <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-600 font-extrabold text-[10px]">
-              MANDIBULAR ARCH
+          {/* Arch Divider Gap */}
+          <div className="my-5 border-b border-dashed border-slate-200 relative">
+            <span className="absolute left-1/2 -top-2.5 -translate-x-1/2 bg-white px-3 text-[10px] font-bold text-slate-400 tracking-wider">
+              OCCLUSAL PLANE
             </span>
-            <span>Lower Left (LL / Quad 3)</span>
+          </div>
+
+          {/* Lower Arch (Mandible) */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-center gap-6">
+              {/* LR Quadrant */}
+              <div className="flex items-center gap-1.5 justify-end flex-1">
+                {lowerRight.map(tooth => (
+                  <ToothVisual
+                    key={tooth.fdi}
+                    tooth={tooth}
+                    finding={chartFindings[String(tooth.fdi)]}
+                    notation={activeNotation}
+                    isPediatric={dentition === 'pediatric'}
+                    isSelected={selectedTooth?.fdi === tooth.fdi}
+                    onClick={handleToothClick}
+                  />
+                ))}
+              </div>
+
+              {/* Anatomical Midline */}
+              <div className="w-0.5 h-20 bg-sky-400/60 relative flex items-center justify-center">
+                <span className="absolute -bottom-3 text-[9px] font-black text-[#004884] uppercase tracking-widest">
+                  Midline
+                </span>
+              </div>
+
+              {/* LL Quadrant */}
+              <div className="flex items-center gap-1.5 justify-start flex-1">
+                {lowerLeft.map(tooth => (
+                  <ToothVisual
+                    key={tooth.fdi}
+                    tooth={tooth}
+                    finding={chartFindings[String(tooth.fdi)]}
+                    notation={activeNotation}
+                    isPediatric={dentition === 'pediatric'}
+                    isSelected={selectedTooth?.fdi === tooth.fdi}
+                    onClick={handleToothClick}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 px-2 uppercase tracking-wider pt-2">
+              <span>Lower Right (LR / Quad 4)</span>
+              <span className="bg-slate-100 px-2.5 py-0.5 rounded text-slate-600 font-extrabold text-[10px]">
+                MANDIBULAR ARCH
+              </span>
+              <span>Lower Left (LL / Quad 3)</span>
+            </div>
           </div>
         </div>
       </div>
@@ -379,8 +385,8 @@ export const Odontogram: React.FC<OdontogramProps> = ({
 
       {/* Detailed Tooth Inspector Modal */}
       {selectedTooth && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-5 animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-slate-100 space-y-4 sm:space-y-5 animate-in fade-in zoom-in-95 duration-150 max-h-[92vh] overflow-y-auto">
             <div className="flex items-start justify-between">
               <div>
                 <span className="text-xs font-bold text-[#004884] bg-sky-50 px-2.5 py-1 rounded-full border border-sky-200">

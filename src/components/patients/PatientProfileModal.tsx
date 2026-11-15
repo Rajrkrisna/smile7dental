@@ -183,25 +183,25 @@ export const PatientProfileModal: React.FC<PatientProfileModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-5">
-      <div className="bg-white rounded-3xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-2 sm:p-5">
+      <div className="bg-white rounded-2xl sm:rounded-3xl max-w-5xl w-full max-h-[96vh] sm:max-h-[92vh] flex flex-col shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
         {/* Header with Patient Summary - Signature Smile7 Blue Gradient */}
-        <div className="p-6 bg-gradient-to-r from-[#002244] via-[#004884] to-[#0284c7] text-white shrink-0">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2.5">
-                <h2 className="text-xl font-black tracking-tight">{patient.name}</h2>
-                <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-white/15 text-sky-200 border border-white/20">
+        <div className="p-4 sm:p-6 bg-gradient-to-r from-[#002244] via-[#004884] to-[#0284c7] text-white shrink-0">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 flex-wrap min-w-0">
+                <h2 className="text-lg sm:text-xl font-black tracking-tight break-words">{patient.name}</h2>
+                <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-white/15 text-sky-200 border border-white/20 shrink-0">
                   {patient.patientId}
                 </span>
-                <span className="text-xs text-sky-100/80">
+                <span className="text-xs text-sky-100/80 shrink-0">
                   {patient.age} Yrs • {patient.gender} • Blood Group {patient.bloodGroup || 'N/A'}
                 </span>
               </div>
 
               {/* Patient Contacts */}
-              <div className="flex flex-wrap items-center gap-3 text-xs text-sky-100/90 mt-2">
-                <span className="flex items-center gap-1.5 font-mono">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-sky-100/90 mt-2">
+                <span className="flex items-center gap-1.5 font-mono shrink-0">
                   <Phone className="w-3.5 h-3.5 text-sky-300" />
                   {patient.phone}
                 </span>
@@ -212,22 +212,22 @@ export const PatientProfileModal: React.FC<PatientProfileModalProps> = ({
                   )}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 font-bold text-[11px] transition-colors border border-emerald-400/30"
+                  className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 font-bold text-[11px] transition-colors border border-emerald-400/30 shrink-0"
                   title="Open WhatsApp chat with patient"
                 >
                   <MessageSquare className="w-3 h-3 text-emerald-400" />
                   <span>WhatsApp</span>
                 </a>
                 {patient.email && (
-                  <span className="flex items-center gap-1.5">
-                    <Mail className="w-3.5 h-3.5 text-sky-300" />
-                    {patient.email}
+                  <span className="flex items-center gap-1.5 truncate max-w-xs">
+                    <Mail className="w-3.5 h-3.5 text-sky-300 shrink-0" />
+                    <span className="truncate">{patient.email}</span>
                   </span>
                 )}
                 {patient.address ? (
-                  <span className="flex items-center gap-1.5 bg-white/10 px-2 py-0.5 rounded-lg border border-white/20">
+                  <span className="flex items-center gap-1.5 bg-white/10 px-2 py-0.5 rounded-lg border border-white/20 max-w-full">
                     <MapPin className="w-3.5 h-3.5 text-sky-300 shrink-0" />
-                    <span>{patient.address}</span>
+                    <span className="truncate max-w-xs sm:max-w-md">{patient.address}</span>
                     <button
                       type="button"
                       onClick={() => {
@@ -236,7 +236,7 @@ export const PatientProfileModal: React.FC<PatientProfileModalProps> = ({
                           updatePatient({ ...patient, address: newLoc.trim() || undefined });
                         }
                       }}
-                      className="ml-1 text-[10px] text-sky-200 underline hover:text-white cursor-pointer"
+                      className="ml-1 text-[10px] text-sky-200 underline hover:text-white cursor-pointer shrink-0"
                       title="Edit location"
                     >
                       Edit
@@ -251,7 +251,7 @@ export const PatientProfileModal: React.FC<PatientProfileModalProps> = ({
                         updatePatient({ ...patient, address: newLoc.trim() });
                       }
                     }}
-                    className="flex items-center gap-1 bg-white/15 hover:bg-white/25 px-2 py-0.5 rounded-lg text-sky-200 hover:text-white text-[11px] font-bold border border-white/20 cursor-pointer"
+                    className="flex items-center gap-1 bg-white/15 hover:bg-white/25 px-2 py-0.5 rounded-lg text-sky-200 hover:text-white text-[11px] font-bold border border-white/20 cursor-pointer shrink-0"
                     title="Add location for patient"
                   >
                     <MapPin className="w-3 h-3 text-sky-300" />
@@ -262,7 +262,7 @@ export const PatientProfileModal: React.FC<PatientProfileModalProps> = ({
             </div>
 
             {/* Quick Actions & Close */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap self-end sm:self-auto shrink-0">
               <button
                 type="button"
                 onClick={() => onOpenNewInvoiceForPatient(patient.id)}
@@ -289,7 +289,7 @@ export const PatientProfileModal: React.FC<PatientProfileModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="p-1 text-sky-200 hover:text-white rounded-lg cursor-pointer"
+                className="p-1.5 text-sky-200 hover:text-white rounded-lg cursor-pointer hover:bg-white/10"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -298,29 +298,31 @@ export const PatientProfileModal: React.FC<PatientProfileModalProps> = ({
 
           {/* Reason for Visit / Chief Complaint */}
           {patient.chiefComplaint && (
-            <div className="mt-3 p-2.5 bg-white/10 rounded-xl border border-white/15 text-xs text-sky-100 flex items-center gap-2">
+            <div className="mt-3 p-2.5 bg-white/10 rounded-xl border border-white/15 text-xs text-sky-100 flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2">
               <span className="font-bold text-sky-200 uppercase text-[10px] tracking-wider shrink-0">Reason for Visit:</span>
-              <span className="font-medium">{patient.chiefComplaint}</span>
+              <span className="font-medium break-words">{patient.chiefComplaint}</span>
             </div>
           )}
 
           {/* Critical Medical Alerts Banner */}
           {patient.medicalAlerts.length > 0 && (
-            <div className="mt-3 p-2.5 bg-rose-500/20 border border-rose-400/40 rounded-xl flex items-center gap-2 text-rose-100 text-xs font-bold">
-              <AlertTriangle className="w-4 h-4 text-rose-300 shrink-0" />
-              <span>Medical Caution:</span>
-              <div className="flex flex-wrap gap-1.5">
-                {patient.medicalAlerts.map(alert => (
-                  <span key={alert} className="bg-rose-500/30 px-2 py-0.5 rounded text-white text-[11px]">
-                    {alert}
-                  </span>
-                ))}
+            <div className="mt-3 p-2.5 bg-rose-500/20 border border-rose-400/40 rounded-xl flex items-start gap-2 text-rose-100 text-xs font-bold">
+              <AlertTriangle className="w-4 h-4 text-rose-300 shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <span className="block sm:inline sm:mr-2">Medical Caution:</span>
+                <div className="inline-flex flex-wrap gap-1.5 mt-1 sm:mt-0">
+                  {patient.medicalAlerts.map(alert => (
+                    <span key={alert} className="bg-rose-500/30 px-2 py-0.5 rounded text-white text-[11px] font-bold">
+                      {alert}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
           )}
 
           {/* Sub Navigation Tabs */}
-          <div className="flex items-center gap-1 mt-5 border-t border-white/15 pt-3 overflow-x-auto scrollbar-none">
+          <div className="flex items-center gap-1.5 mt-4 sm:mt-5 border-t border-white/15 pt-3 overflow-x-auto pb-1.5 scrollbar-none">
             {[
               { id: 'chart', label: 'Dental Chart (Odontogram)', icon: Activity },
               { id: 'visits', label: `Visit History (${patientVisits.length})`, icon: Clock },
@@ -336,7 +338,7 @@ export const PatientProfileModal: React.FC<PatientProfileModalProps> = ({
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id as any)}
-                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer shrink-0 ${
                     isActive
                       ? 'bg-white text-[#004884] shadow-xs'
                       : 'text-sky-100/80 hover:text-white hover:bg-white/10'
@@ -351,7 +353,7 @@ export const PatientProfileModal: React.FC<PatientProfileModalProps> = ({
         </div>
 
         {/* Tab Content Body */}
-        <div className="p-6 overflow-y-auto flex-1 bg-slate-50">
+        <div className="p-3.5 sm:p-6 overflow-y-auto flex-1 bg-slate-50">
           {/* TAB 1: DENTAL CHART ODONTOGRAM */}
           {activeTab === 'chart' && (
             <div className="space-y-4">
@@ -422,27 +424,27 @@ export const PatientProfileModal: React.FC<PatientProfileModalProps> = ({
                       className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-2xs space-y-3"
                     >
                       {/* Sitting header */}
-                      <div className="flex items-start justify-between gap-3 pb-2.5 border-b border-slate-100">
-                        <div className="flex items-center gap-2.5">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-slate-100">
+                        <div className="flex items-center gap-2.5 min-w-0">
                           <span className="w-8 h-8 rounded-xl bg-[#004884] text-white flex items-center justify-center font-black text-xs shrink-0">
                             #{v.visitNumber}
                           </span>
-                          <div>
-                            <div className="flex items-center gap-2">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
                               <span className="font-extrabold text-xs text-slate-900">
                                 {formatIndianDate(v.date)} {v.time ? `• ${v.time}` : ''}
                               </span>
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-50 text-[#004884] border border-sky-200">
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-50 text-[#004884] border border-sky-200 shrink-0">
                                 {v.visitType}
                               </span>
                             </div>
-                            <p className="text-[11px] text-slate-500 font-medium">
+                            <p className="text-[11px] text-slate-500 font-medium truncate">
                               Attending Doctor: <strong>{v.doctor}</strong> • {v.chair}
                             </p>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0">
                           <a
                             href={getWhatsAppUrl(
                               patient.phone,
@@ -523,8 +525,8 @@ ${v.nextVisitDate ? `- Next Sitting: ${formatIndianDate(v.nextVisitDate)}` : ''}
                       )}
 
                       {/* Financials & Recall */}
-                      <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 text-xs">
-                        <div className="flex items-center gap-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-slate-100 text-xs">
+                        <div className="flex items-center gap-3 flex-wrap">
                           <span>Fee: <strong className="text-slate-900">{formatINR(v.feeCharged)}</strong></span>
                           <span>Settled: <strong className="text-emerald-700">{formatINR(v.amountPaid)}</strong> ({v.paymentMode})</span>
                         </div>
@@ -544,7 +546,7 @@ ${v.nextVisitDate ? `- Next Sitting: ${formatIndianDate(v.nextVisitDate)}` : ''}
           {/* TAB 2: CLINICAL SOAP NOTES */}
           {activeTab === 'notes' && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <h3 className="font-extrabold text-sm text-slate-900">
                     Clinical Progress & SOAP Notes
@@ -556,7 +558,7 @@ ${v.nextVisitDate ? `- Next Sitting: ${formatIndianDate(v.nextVisitDate)}` : ''}
                 <button
                   type="button"
                   onClick={() => setIsAddNoteOpen(true)}
-                  className="px-3.5 py-2 rounded-xl bg-[#004884] hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl bg-[#004884] hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer self-start sm:self-auto shrink-0 shadow-xs"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Write SOAP Note
@@ -571,8 +573,8 @@ ${v.nextVisitDate ? `- Next Sitting: ${formatIndianDate(v.nextVisitDate)}` : ''}
               ) : (
                 <div className="space-y-3">
                   {patientNotes.map(n => (
-                    <div key={n.id} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-                      <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                    <div key={n.id} className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-100">
                         <span className="text-xs font-black text-slate-900">
                           Visit Date: {n.date}
                         </span>
@@ -608,7 +610,7 @@ ${v.nextVisitDate ? `- Next Sitting: ${formatIndianDate(v.nextVisitDate)}` : ''}
           {/* TAB 3: PRESCRIPTIONS (RX) */}
           {activeTab === 'rx' && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <h3 className="font-extrabold text-sm text-slate-900">
                     Patient Dental Prescriptions
@@ -620,7 +622,7 @@ ${v.nextVisitDate ? `- Next Sitting: ${formatIndianDate(v.nextVisitDate)}` : ''}
                 <button
                   type="button"
                   onClick={() => setIsAddRxOpen(true)}
-                  className="px-3.5 py-2 rounded-xl bg-[#004884] hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl bg-[#004884] hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer self-start sm:self-auto shrink-0 shadow-xs"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Prescribe Rx
@@ -635,10 +637,10 @@ ${v.nextVisitDate ? `- Next Sitting: ${formatIndianDate(v.nextVisitDate)}` : ''}
               ) : (
                 <div className="space-y-3">
                   {patientRx.map(rx => (
-                    <div key={rx.id} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-                      <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                        <div>
-                          <span className="text-xs font-bold px-2 py-0.5 rounded bg-sky-50 text-[#004884] mr-2">
+                    <div key={rx.id} className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-100">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-xs font-bold px-2 py-0.5 rounded bg-sky-50 text-[#004884] shrink-0">
                             {rx.prescriptionNumber}
                           </span>
                           <span className="text-xs font-bold text-slate-700">
@@ -650,13 +652,13 @@ ${v.nextVisitDate ? `- Next Sitting: ${formatIndianDate(v.nextVisitDate)}` : ''}
 
                       <div className="space-y-2">
                         {rx.medications.map((m, idx) => (
-                          <div key={idx} className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between text-xs">
+                          <div key={idx} className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
                             <div>
                               <span className="font-extrabold text-slate-900">{m.name}</span>
                               <span className="text-slate-500 ml-2">({m.dosage})</span>
                               <p className="text-[11px] text-[#004884] font-medium">{m.instructions}</p>
                             </div>
-                            <div className="text-right">
+                            <div className="text-left sm:text-right shrink-0">
                               <span className="font-bold text-slate-800">{m.frequency}</span>
                               <span className="block text-[11px] text-slate-400">{m.duration}</span>
                             </div>
@@ -679,7 +681,7 @@ ${v.nextVisitDate ? `- Next Sitting: ${formatIndianDate(v.nextVisitDate)}` : ''}
           {/* TAB 4: BILLING & INVOICES */}
           {activeTab === 'billing' && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <h3 className="font-extrabold text-sm text-slate-900">
                     Billing Ledger & Invoices
@@ -691,7 +693,7 @@ ${v.nextVisitDate ? `- Next Sitting: ${formatIndianDate(v.nextVisitDate)}` : ''}
                 <button
                   type="button"
                   onClick={() => onOpenNewInvoiceForPatient(patient.id)}
-                  className="px-3.5 py-2 rounded-xl bg-[#004884] hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl bg-[#004884] hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer self-start sm:self-auto shrink-0 shadow-xs"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   New Dental Bill
@@ -706,9 +708,9 @@ ${v.nextVisitDate ? `- Next Sitting: ${formatIndianDate(v.nextVisitDate)}` : ''}
               ) : (
                 <div className="space-y-2.5">
                   {patientInvoices.map(inv => (
-                    <div key={inv.id} className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex items-center justify-between gap-4">
+                    <div key={inv.id} className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-black text-xs text-slate-900">{inv.invoiceNumber}</span>
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                             inv.status === 'Paid' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
@@ -721,7 +723,7 @@ ${v.nextVisitDate ? `- Next Sitting: ${formatIndianDate(v.nextVisitDate)}` : ''}
                         </p>
                       </div>
 
-                      <div className="text-right">
+                      <div className="text-left sm:text-right shrink-0">
                         <span className="text-sm font-black text-slate-900 block">
                           {clinicProfile.currencySymbol}{inv.total.toFixed(2)}
                         </span>
@@ -741,7 +743,7 @@ ${v.nextVisitDate ? `- Next Sitting: ${formatIndianDate(v.nextVisitDate)}` : ''}
           {/* TAB 5: APPOINTMENTS */}
           {activeTab === 'appointments' && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <h3 className="font-extrabold text-sm text-slate-900">
                     Visit & Appointment History
@@ -753,7 +755,7 @@ ${v.nextVisitDate ? `- Next Sitting: ${formatIndianDate(v.nextVisitDate)}` : ''}
                 <button
                   type="button"
                   onClick={() => onOpenNewAppointmentForPatient(patient.id)}
-                  className="px-3.5 py-2 rounded-xl bg-[#004884] hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl bg-[#004884] hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer self-start sm:self-auto shrink-0 shadow-xs"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Book Appointment
@@ -768,14 +770,14 @@ ${v.nextVisitDate ? `- Next Sitting: ${formatIndianDate(v.nextVisitDate)}` : ''}
               ) : (
                 <div className="space-y-2">
                   {patientAppointments.map(appt => (
-                    <div key={appt.id} className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex items-center justify-between gap-4">
+                    <div key={appt.id} className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div>
                         <span className="font-bold text-xs text-slate-900">{appt.procedure}</span>
                         <p className="text-[11px] text-slate-500">
                           {formatIndianDate(appt.date)} at {appt.startTime} ({appt.durationMin} mins) • {appt.chair}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap shrink-0">
                         <a
                           href={getWhatsAppUrl(
                             appt.patientPhone,
@@ -812,8 +814,8 @@ ${v.nextVisitDate ? `- Next Sitting: ${formatIndianDate(v.nextVisitDate)}` : ''}
 
         {/* Modal New SOAP Note Sub-Modal */}
         {isAddNoteOpen && (
-          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-60 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-60 flex items-center justify-center p-3 sm:p-4">
+            <div className="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                 <h3 className="font-extrabold text-sm text-slate-900">Add Clinical SOAP Note</h3>
                 <button type="button" onClick={() => setIsAddNoteOpen(false)} className="text-slate-400 hover:text-slate-600">✕</button>
@@ -846,8 +848,8 @@ ${v.nextVisitDate ? `- Next Sitting: ${formatIndianDate(v.nextVisitDate)}` : ''}
 
         {/* Modal New Rx Sub-Modal */}
         {isAddRxOpen && (
-          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-60 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-60 flex items-center justify-center p-3 sm:p-4">
+            <div className="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                 <h3 className="font-extrabold text-sm text-slate-900">Write Dental Prescription (Rx)</h3>
                 <button type="button" onClick={() => setIsAddRxOpen(false)} className="text-slate-400 hover:text-slate-600">✕</button>
