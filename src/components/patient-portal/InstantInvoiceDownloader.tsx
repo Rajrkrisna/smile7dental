@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import type { Invoice, ClinicProfile } from '../../types';
 import { InvoiceA4Print } from '../invoices/InvoiceA4Print';
+import { downloadStandaloneInvoiceFile } from '../../utils/printUtils';
 import { 
   Download, 
   Printer, 
   Phone, 
-  ShieldCheck 
+  ShieldCheck,
+  FileDown
 } from 'lucide-react';
 
 interface InstantInvoiceDownloaderProps {
@@ -66,6 +68,16 @@ export const InstantInvoiceDownloader: React.FC<InstantInvoiceDownloaderProps> =
             >
               <Download className="w-4 h-4 animate-bounce" />
               <span>{downloadTriggered ? 'Saved! Download PDF Again' : 'Download PDF (1-Click)'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => downloadStandaloneInvoiceFile(invoice, clinic)}
+              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer hidden sm:flex items-center gap-1.5"
+              title="Save an offline HTML document copy"
+            >
+              <FileDown className="w-4 h-4 text-slate-600" />
+              <span className="hidden lg:inline text-[11px]">Save Offline Copy</span>
             </button>
 
             <button
