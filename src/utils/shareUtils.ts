@@ -62,6 +62,100 @@ export const encodeInvoicePayload = (invoice: Invoice, _clinic: ClinicProfile): 
 };
 
 /**
+ * Decodes a clean, single-line query string (e.g. ?inv=S7D-1005&p=rk&t=2465&th=16)
+ * into a full official Invoice and ClinicProfile.
+ */
+export const parseInvoiceFromQueryParams = (params: URLSearchParams): { invoice: Invoice; clinic: ClinicProfile } | null => {
+  const invNum = params.get('inv') || params.get('i');
+  if (!invNum) return null;
+
+  const defaultClinic: ClinicProfile = {
+    name: 'Smile7 Dental Clinic',
+    tagline: 'Prevent Now! Smile Forever!',
+    dentistInCharge: 'Dr. P. Manickapriya',
+    registrationNumber: '',
+    dentalCouncilNumber: 'Tamil Nadu Dental Council Reg. #24892',
+    taxId: '',
+    phone: '+91 97908 62510',
+    email: 'care@smile7dental.com',
+    website: 'https://smile7dental.com/',
+    addressLine1: 'No. 1/2, Alapakkam Main Road, Janaki Nagar, Maduravoyal',
+    addressLine2: '',
+    city: 'Chennai',
+    state: 'Tamil Nadu',
+    zipCode: '600095',
+    currencySymbol: '₹',
+    currencyCode: 'INR',
+    defaultTaxRate: 0,
+    defaultToothNotation: 'fdi',
+    invoicePrefix: 'S7D',
+    invoiceFooterNote: 'Thank you for choosing Smile7 Dental Clinic. Please keep this invoice for warranty and clinical insurance records.',
+    bankDetails: {
+      accountName: 'Smile7 Dental Clinic',
+      accountNumber: '',
+      ifscOrRouting: '',
+      bankName: '',
+      upiId: '9790862510@okaxis'
+    }
+  };
+
+  const patientName = params.get('p') || params.get('name') || 'Patient';
+  const total = parseFloat(params.get('t') || params.get('amt') || '0');
+  const balance = parseFloat(params.get('b') || params.get('bal') || '0');
+  const paid = parseFloat(params.get('pd') || params.get('paid') || String(total - balance));
+  const teethStr = params.get('th') || params.get('tooth') || '';
+  const procName = params.get('pr') || params.get('proc') || 'Consultation & Dental Treatment';
+  const dateStr = params.get('dt') || new Date().toISOString().split('T')[0];
+
+  const teeth = teethStr ? teethStr.split(',') : ['16'];
+
+  const items: InvoiceItem[] = [
+    {
+      id: 'item_0',
+      procedureId: 'proc_0',
+      procedureCode: 'S7D',
+      procedureName: procName,
+      category: 'Restorative',
+      quantity: 1,
+      unitPrice: total,
+      lineTotal: total,
+      toothNumbers: teeth,
+      discountType: 'fixed',
+      discountValue: 0,
+      taxPercent: 0
+    }
+  ];
+
+  const invoice: Invoice = {
+    id: `inv-${invNum}`,
+    invoiceNumber: invNum,
+    date: dateStr,
+    dueDate: dateStr,
+    patientId: 'PAT-PORTAL',
+    patientName: patientName,
+    patientPhone: params.get('ph') || '',
+    patientAge: 30,
+    patientGender: 'other',
+    doctorName: defaultClinic.dentistInCharge,
+    subtotal: total,
+    totalItemDiscount: 0,
+    additionalDiscountType: 'fixed',
+    additionalDiscountValue: 0,
+    totalTax: 0,
+    grandTotal: total,
+    amountPaid: paid,
+    balanceDue: balance,
+    status: balance === 0 ? 'paid' : 'partial',
+    items: items,
+    payments: [],
+    createdAt: dateStr,
+    updatedAt: dateStr
+  };
+
+  return { invoice, clinic: defaultClinic };
+};
+
+/**
  * Decodes the portable invoice token from the URL (supports both compact array and legacy object schemas)
  */
 export const decodeInvoicePayload = (token: string): { invoice: Invoice; clinic: ClinicProfile } | null => {
@@ -107,7 +201,7 @@ export const decodeInvoicePayload = (token: string): { invoice: Invoice; clinic:
         procedureId: it[1] || `proc_${index}`,
         procedureCode: it[1] || 'S7D',
         procedureName: it[0] || 'Dental Procedure',
-        category: 'general',
+        category: 'Restorative',
         quantity: it[2] || 1,
         unitPrice: it[3] || 0,
         lineTotal: it[4] || 0,

@@ -263,3 +263,4 @@ export function downloadInvoicePdf(invoice: Invoice, clinic: ClinicProfile): str
     return '';
   }
 }
+
