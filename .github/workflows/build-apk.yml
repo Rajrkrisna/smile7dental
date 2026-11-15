@@ -54,26 +54,15 @@ jobs:
       - name: Build Android Debug APK
         working-directory: ./android
         run: |
-          ./gradlew assembleDebug --no-daemon --stacktrace > ../gradle.log 2>&1 || true
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: Package Output APK or Commit Log
+      - name: Package Output APK
         run: |
+          mkdir -p build-output
           APK_FILE=$(find android/ -name "*debug*.apk" | head -n 1)
-          if [ -n "$APK_FILE" ]; then
-            echo "Found APK at: $APK_FILE"
-            mkdir -p build-output
-            cp "$APK_FILE" build-output/Smile7Dental-Clinic.apk
-            ls -lh build-output/
-          else
-            echo "=== GRADLE LOG TAIL ==="
-            tail -n 60 gradle.log
-            git config user.name "GitHub Actions"
-            git config user.email "actions@github.com"
-            git add gradle.log
-            git commit -m "chore: save gradle error log"
-            git push origin mobile-app
-            exit 1
-          fi
+          echo "Found APK at: $APK_FILE"
+          cp "$APK_FILE" build-output/Smile7Dental-Clinic.apk
+          ls -lh build-output/
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
