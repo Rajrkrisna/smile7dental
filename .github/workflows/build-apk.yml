@@ -55,20 +55,14 @@ jobs:
       - name: Build Android Debug APK
         working-directory: ./android
         run: |
-          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tee gradle-build.log
-
-      - name: Upload Build Log on Failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: gradle-build-log
-          path: android/gradle-build.log
-          retention-days: 7
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Package Output APK
         run: |
           mkdir -p build-output
-          cp android/app/build/outputs/apk/debug/app-debug.apk build-output/Smile7Dental-Clinic.apk
+          find android/ -name "*.apk"
+          find android/ -name "*.apk" -exec cp {} build-output/Smile7Dental-Clinic.apk \;
+          ls -lh build-output/
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
@@ -89,7 +83,7 @@ jobs:
             ### How to Install on Android:
             1. Download **`Smile7Dental-Clinic.apk`** below.
             2. On your Android phone, tap the downloaded file.
-            3. If Android prompts with security message, tap **Settings** and enable **Allow from this source**.
+            3. If Android prompts with a security warning, tap **Settings** and enable **Allow from this source**.
             4. Tap **Install** and open **Smile7 Dental**!
           files: build-output/Smile7Dental-Clinic.apk
         env:
