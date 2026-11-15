@@ -132,12 +132,13 @@ export const generateInvoiceHtmlDocument = (invoice: Invoice, clinic: ClinicProf
     <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #004884; padding-bottom: 20px;">
       <div style="display: flex; align-items: flex-start; gap: 16px;">
         <!-- Official Clinic Logo Emblem -->
-        <div style="width: 58px; height: 58px; background: linear-gradient(135deg, #004884 0%, #0284c7 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,72,132,0.25); flex-shrink: 0;">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2C8.5 2 6 4.5 6 7.5C6 9.5 7 11.5 8 13.5C9 15.5 9.5 18 10 21C10.2 21.8 11.2 22 11.8 21.4L12 21.2C12.2 21 12.5 21 12.7 21.2L12.9 21.4C13.5 22 14.5 21.8 14.7 21C15.2 18 15.7 15.5 16.7 13.5C17.7 11.5 18.7 9.5 18.7 7.5C18.7 4.5 16.2 2 12.7 2H12Z" fill="#ffffff" fill-opacity="0.95"/>
-            <path d="M9.5 7C10.5 5.8 12 5.8 13 7C13.5 7.6 14.5 7.6 15 7" stroke="#004884" stroke-width="1.5" stroke-linecap="round"/>
-            <circle cx="17.5" cy="5.5" r="1.5" fill="#38bdf8"/>
-          </svg>
+        <div style="width: 58px; height: 58px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,72,132,0.12); overflow: hidden; padding: 4px;">
+          <img 
+            src="https://smile7dental.com/assets/smile7-logo-icon.png" 
+            alt="Smile7 Dental Clinic Logo" 
+            style="width: 100%; height: 100%; object-fit: contain;" 
+            onerror="this.onerror=null; this.src='https://smile7dental.com/favicon.png';"
+          />
         </div>
         <div>
           <div style="display: flex; align-items: center; gap: 8px;">

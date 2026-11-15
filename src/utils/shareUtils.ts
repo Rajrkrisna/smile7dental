@@ -72,7 +72,7 @@ export const decodeInvoicePayload = (token: string): { invoice: Invoice; clinic:
 
     const defaultClinic: ClinicProfile = {
       name: 'Smile7 Dental Clinic',
-      tagline: 'Precision Dental Care Redefined for Comfort',
+      tagline: 'Prevent Now! Smile Forever!',
       dentistInCharge: 'Dr. P. Manickapriya',
       registrationNumber: '',
       dentalCouncilNumber: 'Tamil Nadu Dental Council Reg. #24892',

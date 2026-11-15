@@ -74,7 +74,7 @@ export const PRIMARY_TEETH_MAP: ToothInfo[] = [
 
 export const INITIAL_CLINIC_PROFILE: ClinicProfile = {
   name: 'Smile7 Dental Clinic',
-  tagline: 'Precision Dental Care Redefined for Comfort',
+  tagline: 'Prevent Now! Smile Forever!',
   dentistInCharge: 'Dr. P. Manickapriya (BDS)',
   registrationNumber: 'TNDC-DEN/2018/24892',
   dentalCouncilNumber: 'Tamil Nadu Dental Council Reg. #24892',
