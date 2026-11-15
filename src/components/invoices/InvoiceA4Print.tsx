@@ -93,15 +93,6 @@ export const InvoiceA4Print: React.FC<InvoiceA4PrintProps> = ({ invoice, clinic 
           <p className="text-sm font-bold text-slate-900">{invoice.doctorName || clinic.dentistInCharge}</p>
           <p className="text-slate-600">Department of Dental Surgery</p>
           <p className="text-slate-500">{clinic.dentalCouncilNumber}</p>
-          <p className="text-slate-600 mt-1">
-            <span className="font-medium">Status:</span>{' '}
-            <span className={`inline-block font-bold uppercase px-2 py-0.5 rounded text-[10px] ${
-              invoice.status === 'paid' ? 'bg-emerald-100 text-emerald-800' :
-              invoice.status === 'partial' ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'
-            }`}>
-              {invoice.status.toUpperCase()}
-            </span>
-          </p>
         </div>
       </div>
 
@@ -239,6 +230,20 @@ export const InvoiceA4Print: React.FC<InvoiceA4PrintProps> = ({ invoice, clinic 
           }`}>
             <span>Balance Due</span>
             <span>{formatCurrency(invoice.balanceDue, clinic.currencySymbol)}</span>
+          </div>
+
+          {/* Payment Status Placed Below Total Amounts */}
+          <div className="flex justify-between items-center py-1.5 px-2 mt-1 rounded bg-slate-50 border border-slate-200">
+            <span className="font-bold text-slate-600 uppercase text-[10px]">Payment Status:</span>
+            <span className={`inline-block font-black uppercase px-2.5 py-0.5 rounded text-[11px] tracking-wide ${
+              invoice.balanceDue === 0 || invoice.status === 'paid'
+                ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                : invoice.amountPaid > 0
+                ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                : 'bg-rose-100 text-rose-800 border border-rose-300'
+            }`}>
+              {invoice.balanceDue === 0 || invoice.status === 'paid' ? 'PAID IN FULL' : invoice.amountPaid > 0 ? 'PARTIAL PAYMENT' : 'PAYMENT DUE'}
+            </span>
           </div>
         </div>
       </div>
