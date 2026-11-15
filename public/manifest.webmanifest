@@ -1,14 +1,14 @@
 {
   "name": "Smile7 Dental Clinic",
   "short_name": "Smile7 Dental",
-  "description": "Smile7 Dental Clinic Patient & Billing Management System",
-  "start_url": "/#billing",
+  "description": "Smile7 Dental Clinic - Precision Dental Care Redefined for Comfort",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#FFFFFF",
   "theme_color": "#004884",
-  "categories": ["medical", "business", "productivity"],
+  "categories": ["medical", "health"],
   "icons": [
     {
       "src": "/favicon.png",

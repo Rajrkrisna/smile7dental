@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Navbar } from '../ui/Navbar';
 import { HeroSection } from '../sections/HeroSection';
 import { ClinicalServicesSection } from '../sections/ClinicalServicesSection';
@@ -9,27 +9,11 @@ import { FooterSection } from '../sections/FooterSection';
 import { BookingModal } from '../sections/BookingModal';
 import { ServiceDetailModal } from '../sections/ServiceDetailModal';
 import type { ServiceData } from '../sections/ServiceDetailModal';
-interface MainClinicWebsiteProps {
-  onOpenBillingPortal: () => void;
-}
-
-export const MainClinicWebsite: React.FC<MainClinicWebsiteProps> = ({ onOpenBillingPortal }) => {
+export const MainClinicWebsite: React.FC = () => {
   const [isBookingOpen, setIsBookingOpen] = useState<boolean>(false);
   const [bookingTreatment, setBookingTreatment] = useState<string | undefined>(undefined);
   const [selectedService, setSelectedService] = useState<ServiceData | null>(null);
   const [isServiceModalOpen, setIsServiceModalOpen] = useState<boolean>(false);
-
-  // Discreet keyboard shortcut for Dr. Manickapriya & clinic staff (Ctrl + Shift + B or Cmd + Shift + B)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'B' || e.key === 'b')) {
-        e.preventDefault();
-        onOpenBillingPortal();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onOpenBillingPortal]);
 
   const handleOpenGeneralBooking = () => {
     setBookingTreatment(undefined);
@@ -63,8 +47,8 @@ export const MainClinicWebsite: React.FC<MainClinicWebsiteProps> = ({ onOpenBill
         <TestimonialsSection />
       </main>
 
-      {/* Footer with Google Maps Location & Staff Portal Trigger */}
-      <FooterSection onOpenBillingPortal={onOpenBillingPortal} />
+      {/* Footer with Google Maps Location */}
+      <FooterSection />
 
       {/* Interactive Treatment Explanatory Modal */}
       <ServiceDetailModal

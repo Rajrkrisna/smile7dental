@@ -3,11 +3,7 @@ import { MapPin, Phone, Mail, Clock, ShieldCheck, ExternalLink, Navigation } fro
 import logoText from '../../assets/logo-text.jpg';
 import logoIcon from '../../assets/logo-icon.png';
 
-interface FooterSectionProps {
-  onOpenBillingPortal?: () => void;
-}
-
-export const FooterSection: React.FC<FooterSectionProps> = ({ onOpenBillingPortal }) => {
+export const FooterSection: React.FC = () => {
   return (
     <footer id="contact" className="bg-slate-900 text-slate-400 text-sm py-20 px-6 md:px-12 border-t border-slate-800">
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 text-left">
@@ -104,11 +100,7 @@ export const FooterSection: React.FC<FooterSectionProps> = ({ onOpenBillingPorta
 
       {/* Bottom Bar */}
       <div className="max-w-7xl mx-auto border-t border-slate-800 mt-16 pt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 gap-4">
-        <div 
-          onClick={onOpenBillingPortal}
-          className="select-none"
-          title=""
-        >
+        <div>
           &copy; {new Date().getFullYear()} Smile7 Dental Clinic. Dr. P. Manickapriya (BDS, FCD &bull; DCI Reg No: 26448). All Rights Reserved.
         </div>
         <div className="text-slate-500">
