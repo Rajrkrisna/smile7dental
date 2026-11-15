@@ -37,6 +37,7 @@ import {
   mergeDatabases,
   type GitHubSyncConfig 
 } from '../utils/githubSync';
+import { scheduleAppointmentPhoneReminder } from '../utils/appointmentReminders';
 
 interface ClinicContextType {
   clinicProfile: ClinicProfile;
@@ -433,11 +434,13 @@ export const ClinicProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       id: `apt-${Date.now()}`
     };
     setAppointments(prev => [newAppt, ...prev]);
+    scheduleAppointmentPhoneReminder(newAppt, clinicProfile);
     return newAppt;
   };
 
   const updateAppointment = (appointment: Appointment) => {
     setAppointments(prev => prev.map(a => a.id === appointment.id ? appointment : a));
+    scheduleAppointmentPhoneReminder(appointment, clinicProfile);
   };
 
   const updateAppointmentStatus = (id: string, status: AppointmentStatus) => {
@@ -654,7 +657,13 @@ export const ClinicProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       if (data.clinicProfile) setClinicProfile(data.clinicProfile);
       if (data.notation) setNotation(data.notation);
       if (Array.isArray(data.patients)) setPatients(data.patients);
-      if (Array.isArray(data.appointments)) setAppointments(data.appointments);
+      if (Array.isArray(data.appointments)) {
+        setAppointments(data.appointments);
+        // Automatically schedule phone notifications for upcoming appointments
+        data.appointments.forEach((a: Appointment) => {
+          scheduleAppointmentPhoneReminder(a, data.clinicProfile || clinicProfile);
+        });
+      }
       if (Array.isArray(data.clinicalNotes)) setClinicalNotes(data.clinicalNotes);
       if (Array.isArray(data.prescriptions)) setPrescriptions(data.prescriptions);
       if (Array.isArray(data.invoices)) setInvoices(data.invoices);

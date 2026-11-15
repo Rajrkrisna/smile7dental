@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
 import { useClinic } from '../../context/ClinicContext';
-import { X, Calendar, Clock, Armchair, MessageSquare, Bell } from 'lucide-react';
+import { X, Calendar, Clock, Armchair, MessageSquare, Bell, Smartphone, ExternalLink } from 'lucide-react';
 import { getWhatsAppUrl, getAppointmentWhatsAppText } from '../../utils/whatsapp';
 import { formatIndianDate } from '../../utils/currency';
 import type { Appointment } from '../../types';
+import { 
+  scheduleAppointmentPhoneReminder, 
+  createGoogleCalendarUrl, 
+  getAppointmentDateTime, 
+  getTwoDaysBeforeReminder 
+} from '../../utils/appointmentReminders';
 
 interface NewAppointmentModalProps {
   onClose: () => void;
@@ -26,8 +32,19 @@ export const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
   const [procedure, setProcedure] = useState(procedures[0]?.name || 'Consultation & Oral Examination');
   const [notes, setNotes] = useState('');
   const [sendWhatsAppReminder, setSendWhatsAppReminder] = useState(true);
+  const [setPhoneReminder, setSetPhoneReminder] = useState(true);
+  const [addToCalendar, setAddToCalendar] = useState(false);
 
   const selectedPatient = patients.find(p => p.id === patientId);
+
+  // Compute 2-days before notification date preview
+  const apptDateTime = getAppointmentDateTime(date, startTime);
+  const twoDaysBefore = getTwoDaysBeforeReminder(apptDateTime);
+  const twoDaysBeforeFormatted = twoDaysBefore.toLocaleDateString('en-IN', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short'
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +64,18 @@ export const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
       notes: notes.trim() || undefined
     });
 
-    // Auto-launch WhatsApp reminder with schedule date if checked
+    // 1. Schedule Native Phone Reminder 2 Days Before
+    if (setPhoneReminder) {
+      scheduleAppointmentPhoneReminder(newAppt, clinicProfile);
+    }
+
+    // 2. Add to Google / Phone Calendar if selected
+    if (addToCalendar) {
+      const gcalUrl = createGoogleCalendarUrl(newAppt, clinicProfile);
+      window.open(gcalUrl, '_blank');
+    }
+
+    // 3. Auto-launch WhatsApp reminder with schedule date if checked
     if (sendWhatsAppReminder && selectedPatient.phone) {
       const fullClinicAddress = clinicProfile.city
         ? `${clinicProfile.address}, ${clinicProfile.city}`
@@ -201,6 +229,49 @@ export const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
               placeholder="e.g. Ensure medical allergy check, prep rubber dam"
               className="w-full text-xs p-2 rounded-xl border border-slate-200 resize-none focus:outline-none focus:ring-2 focus:ring-[#004884]/20"
             />
+          </div>
+
+          {/* Automated Phone Reminder (2 Days Before) */}
+          <div className="p-3 bg-sky-50/80 border border-sky-200 rounded-xl space-y-1.5 text-xs">
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 cursor-pointer font-bold text-slate-800">
+                <input
+                  type="checkbox"
+                  checked={setPhoneReminder}
+                  onChange={e => setSetPhoneReminder(e.target.checked)}
+                  className="w-4 h-4 text-[#004884] rounded border-sky-300 focus:ring-[#004884] cursor-pointer"
+                />
+                <span className="flex items-center gap-1.5 text-[#004884]">
+                  <Bell className="w-3.5 h-3.5 text-[#004884] shrink-0" />
+                  Add reminder to phone & notify me 2 days before
+                </span>
+              </label>
+              <span className="text-[10px] font-black text-[#004884] bg-white px-2 py-0.5 rounded border border-sky-200">
+                🔔 2 Days Prior
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-500 pl-6 leading-tight">
+              Phone notification rings on <strong>{twoDaysBeforeFormatted}</strong> (at 9:00 AM) and morning of the appointment.
+            </p>
+          </div>
+
+          {/* Optional: Add to Google Calendar */}
+          <div className="p-2.5 bg-slate-50 border border-slate-200/80 rounded-xl flex items-center justify-between text-xs">
+            <label className="flex items-center gap-2 cursor-pointer font-bold text-slate-700">
+              <input
+                type="checkbox"
+                checked={addToCalendar}
+                onChange={e => setAddToCalendar(e.target.checked)}
+                className="w-4 h-4 text-[#004884] rounded border-slate-300 focus:ring-[#004884] cursor-pointer"
+              />
+              <span className="flex items-center gap-1.5 text-slate-700">
+                <Calendar className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                Also open Google / Apple Calendar with 2-day alert
+              </span>
+            </label>
+            <span className="text-[10px] text-slate-400 font-medium">
+              Google Cal
+            </span>
           </div>
 
           {/* Schedule Reminder WhatsApp Option */}

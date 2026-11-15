@@ -21,6 +21,12 @@ import {
 import { getWhatsAppUrl, getAppointmentWhatsAppText } from '../../utils/whatsapp';
 import { formatIndianDate } from '../../utils/currency';
 import type { Appointment, AppointmentStatus } from '../../types';
+import { 
+  getTwoDayAdvancePatientWhatsAppText, 
+  createGoogleCalendarUrl, 
+  downloadCalendarIcsFile, 
+  scheduleAppointmentPhoneReminder 
+} from '../../utils/appointmentReminders';
 
 interface AppointmentCalendarProps {
   onOpenNewAppointment: () => void;
@@ -38,7 +44,9 @@ export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
   // Reminder message preview & dispatch modal state
   const [reminderAppt, setReminderAppt] = useState<Appointment | null>(null);
   const [reminderText, setReminderText] = useState<string>('');
+  const [reminderType, setReminderType] = useState<'twoday' | 'standard'>('twoday');
   const [copiedSuccess, setCopiedSuccess] = useState<boolean>(false);
+  const [phoneAlertSet, setPhoneAlertSet] = useState<boolean>(false);
 
   const fullClinicAddress = clinicProfile.city
     ? `${clinicProfile.address}, ${clinicProfile.city}`
@@ -52,19 +60,32 @@ export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
   };
 
   const handleOpenReminder = (appt: Appointment) => {
-    const defaultMsg = getAppointmentWhatsAppText(
-      appt.patientName,
-      formatIndianDate(appt.date),
-      appt.startTime,
-      clinicProfile.clinicName,
-      appt.doctor,
-      clinicProfile.phone,
-      appt.procedure,
-      fullClinicAddress
-    );
-    setReminderText(defaultMsg);
     setReminderAppt(appt);
+    setReminderType('twoday');
+    setReminderText(getTwoDayAdvancePatientWhatsAppText(appt, clinicProfile));
     setCopiedSuccess(false);
+    setPhoneAlertSet(false);
+  };
+
+  const handleSwitchReminderType = (type: 'twoday' | 'standard') => {
+    if (!reminderAppt) return;
+    setReminderType(type);
+    if (type === 'twoday') {
+      setReminderText(getTwoDayAdvancePatientWhatsAppText(reminderAppt, clinicProfile));
+    } else {
+      setReminderText(
+        getAppointmentWhatsAppText(
+          reminderAppt.patientName,
+          formatIndianDate(reminderAppt.date),
+          reminderAppt.startTime,
+          clinicProfile.clinicName,
+          reminderAppt.doctor,
+          clinicProfile.phone,
+          reminderAppt.procedure,
+          fullClinicAddress
+        )
+      );
+    }
   };
 
   const handleCopyReminder = async () => {
@@ -337,7 +358,6 @@ export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
               <div>
                 <span className="font-black text-[#004884] block">{formatIndianDate(reminderAppt.date)}</span>
                 <span className="text-slate-700 font-bold text-[11px]">{reminderAppt.startTime} ({reminderAppt.durationMin} mins)</span>
-                <span className="text-slate-700 font-bold text-[11px]">ÃƒÆ’Ã‚Â¢Ãƒâ€šÃ‚ÂÃƒâ€šÃ‚Â° {reminderAppt.startTime} ({reminderAppt.durationMin} mins)</span>
               </div>
               <div className="col-span-2 pt-1 border-t border-slate-200/60 flex items-center justify-between">
                 <div>
@@ -347,6 +367,76 @@ export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-sky-50 text-[#004884] border border-sky-200">
                   {reminderAppt.chair}
                 </span>
+              </div>
+            </div>
+
+            {/* Reminder Mode Selector Tabs */}
+            <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-xl text-xs font-bold">
+              <button
+                type="button"
+                onClick={() => handleSwitchReminderType('twoday')}
+                className={`flex-1 py-1.5 px-2 rounded-lg transition-all text-center cursor-pointer ${
+                  reminderType === 'twoday'
+                    ? 'bg-white text-[#004884] shadow-xs font-black'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                🔔 2-Day Advance Reminder
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSwitchReminderType('standard')}
+                className={`flex-1 py-1.5 px-2 rounded-lg transition-all text-center cursor-pointer ${
+                  reminderType === 'standard'
+                    ? 'bg-white text-[#004884] shadow-xs font-black'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                🗓️ Day-Of Schedule Reminder
+              </button>
+            </div>
+
+            {/* Doctor's Phone Notification & Calendar Integration Bar */}
+            <div className="p-3 bg-sky-50/70 border border-sky-200 rounded-xl space-y-2 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-[#004884] flex items-center gap-1.5">
+                  <Bell className="w-3.5 h-3.5" />
+                  Doctor's Phone Alert (2 Days Before at 9:00 AM)
+                </span>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await scheduleAppointmentPhoneReminder(reminderAppt, clinicProfile);
+                    setPhoneAlertSet(true);
+                    setTimeout(() => setPhoneAlertSet(false), 3000);
+                  }}
+                  className={`px-2.5 py-1 text-[11px] font-bold rounded-lg border transition-all cursor-pointer ${
+                    phoneAlertSet
+                      ? 'bg-emerald-600 text-white border-emerald-600'
+                      : 'bg-white text-[#004884] border-sky-300 hover:bg-sky-100'
+                  }`}
+                >
+                  {phoneAlertSet ? '✓ Phone Alert Armed' : 'Set Phone Alert'}
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2 pt-1 border-t border-sky-200/60">
+                <a
+                  href={createGoogleCalendarUrl(reminderAppt, clinicProfile)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 text-center py-1.5 px-2 text-[11px] font-bold bg-white hover:bg-slate-50 text-slate-700 rounded-lg border border-slate-200 transition-colors"
+                >
+                  📅 Add to Google Calendar (2-Day Alert)
+                </a>
+                <button
+                  type="button"
+                  onClick={() => downloadCalendarIcsFile(reminderAppt, clinicProfile)}
+                  className="text-center py-1.5 px-2.5 text-[11px] font-bold bg-white hover:bg-slate-50 text-slate-700 rounded-lg border border-slate-200 transition-colors cursor-pointer"
+                  title="Download .ics file for Apple / Outlook Calendar"
+                >
+                  .ICS File
+                </button>
               </div>
             </div>
 
@@ -419,4 +509,5 @@ export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
     </div>
   );
 };
+
 
