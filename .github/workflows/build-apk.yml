@@ -37,8 +37,9 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Accept Android Licenses
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
       - name: Sync Capacitor Android
         run: npx cap sync android
@@ -73,7 +74,7 @@ jobs:
             ### How to Install on Android:
             1. Download **`Smile7Dental-Clinic.apk`** below.
             2. On your Android phone, tap the downloaded file.
-            3. If Android shows a security prompt, tap **Settings** and allow **Install from this source**.
+            3. If Android prompts with security message, tap **Settings** and enable **Allow from this source**.
             4. Tap **Install** and open **Smile7 Dental**!
           files: build-output/Smile7Dental-Clinic.apk
         env:
