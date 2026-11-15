@@ -1,0 +1,37 @@
+{
+  "name": "dentistry-pro-desktop",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Standalone Dental Clinic Patient Management System (PMS)",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 4500",
+    "build": "tsc -b && vite build",
+    "build:exe": "npm run build && C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\csc.exe /target:winexe /out:Smile7Dental.exe /win32icon:app.ico /r:System.Windows.Forms.dll /r:System.Drawing.dll Smile7App.cs",
+    "preview": "vite preview --port 4500"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/cli": "^8.6.2",
+    "@capacitor/core": "^8.6.2",
+    "@capacitor/ios": "^8.6.2",
+    "canvas-confetti": "^1.9.4",
+    "clsx": "^2.1.1",
+    "framer-motion": "^13.1.0",
+    "lucide-react": "^1.31.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "tailwind-merge": "^3.6.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/canvas-confetti": "^1.9.0",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.4",
+    "tailwindcss": "^4.3.3",
+    "typescript": "~6.0.2",
+    "vite": "^8.2.0"
+  }
+}

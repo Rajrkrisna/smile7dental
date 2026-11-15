@@ -1,0 +1,36 @@
+node_modules/
+dist/
+dist-ssr/
+*.local
+.env
+.env.*
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Binaries
+*.exe
+*.dll
+
+# Android build outputs & caches
+android/.gradle/
+android/app/build/
+android/build/
+android/.idea/
+android/local.properties
+android/*.iml
+android/app/*.iml
+
+# iOS build outputs & caches
+ios/App/Pods/
+ios/App/build/
+ios/App/*.xcworkspace/xcuserdata/
+ios/App/*.xcodeproj/xcuserdata/

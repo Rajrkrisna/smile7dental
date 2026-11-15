@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Smile7 Dental</string>
+    <string name="title_activity_main">Smile7 Dental</string>
+    <string name="package_name">com.smile7dental.clinic</string>
+    <string name="custom_url_scheme">com.smile7dental.clinic</string>
+</resources>
