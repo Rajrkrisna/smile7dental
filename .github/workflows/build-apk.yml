@@ -46,7 +46,6 @@ jobs:
         run: |
           mkdir -p android/app/src/main/assets/public
           cp -r dist/* android/app/src/main/assets/public/
-          npx cap copy android || true
 
       - name: Ensure Gradle Wrapper Executable
         run: |
@@ -60,7 +59,6 @@ jobs:
       - name: Package Output APK
         run: |
           mkdir -p build-output
-          find android/ -name "*.apk"
           find android/ -name "*.apk" -exec cp {} build-output/Smile7Dental-Clinic.apk \;
           ls -lh build-output/
 
