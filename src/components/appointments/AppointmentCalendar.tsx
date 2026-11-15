@@ -19,7 +19,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { getWhatsAppUrl, getAppointmentWhatsAppText } from '../../utils/whatsapp';
-import { formatIndianDate } from '../../utils/currency';
+import { formatIndianDate, formatTimeAMPM } from '../../utils/currency';
 import type { Appointment, AppointmentStatus } from '../../types';
 import { 
   getTwoDayAdvancePatientWhatsAppText, 
@@ -77,7 +77,7 @@ export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
         getAppointmentWhatsAppText(
           reminderAppt.patientName,
           formatIndianDate(reminderAppt.date),
-          reminderAppt.startTime,
+          formatTimeAMPM(reminderAppt.startTime),
           clinicProfile.clinicName,
           reminderAppt.doctor,
           clinicProfile.phone,
@@ -218,9 +218,9 @@ export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
             >
               <div className="flex items-start sm:items-center gap-4">
                 {/* Time & Duration badge */}
-                <div className="w-16 text-center shrink-0 bg-slate-50 p-2 rounded-xl border border-slate-200/80">
-                  <span className="block text-sm font-black text-slate-900 leading-none">
-                    {appt.startTime}
+                <div className="w-20 text-center shrink-0 bg-slate-50 p-2 rounded-xl border border-slate-200/80">
+                  <span className="block text-xs font-black text-slate-900 leading-none">
+                    {formatTimeAMPM(appt.startTime)}
                   </span>
                   <span className="text-[10px] text-slate-400 font-bold mt-1 block">
                     {appt.durationMin} mins
@@ -254,7 +254,7 @@ export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
                     {/* Schedule Date & Time Badge */}
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 text-[#004884] font-bold text-[10px] border border-blue-200">
                       <CalendarIcon className="w-2.5 h-2.5" />
-                      {formatIndianDate(appt.date)} at {appt.startTime}
+                      {formatIndianDate(appt.date)} at {formatTimeAMPM(appt.startTime)}
                     </span>
 
                     {/* Send Reminder Button - Opens Modal with Preview & Date */}
@@ -275,7 +275,7 @@ export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
                         getAppointmentWhatsAppText(
                           appt.patientName,
                           formatIndianDate(appt.date),
-                          appt.startTime,
+                          formatTimeAMPM(appt.startTime),
                           clinicProfile.clinicName,
                           appt.doctor,
                           clinicProfile.phone,
@@ -357,7 +357,7 @@ export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
               </div>
               <div>
                 <span className="font-black text-[#004884] block">{formatIndianDate(reminderAppt.date)}</span>
-                <span className="text-slate-700 font-bold text-[11px]">{reminderAppt.startTime} ({reminderAppt.durationMin} mins)</span>
+                <span className="text-slate-700 font-bold text-[11px]">{formatTimeAMPM(reminderAppt.startTime)} ({reminderAppt.durationMin} mins)</span>
               </div>
               <div className="col-span-2 pt-1 border-t border-slate-200/60 flex items-center justify-between">
                 <div>

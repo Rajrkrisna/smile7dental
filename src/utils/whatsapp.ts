@@ -3,6 +3,8 @@
  * Handles 10-digit Indian mobile numbers (+91) and formats professional clinic messages
  */
 
+import { formatTimeAMPM } from './currency';
+
 export function cleanIndianPhoneForWhatsApp(phone: string): string {
   if (!phone) return '';
   const digits = phone.replace(/\D/g, '');
@@ -44,12 +46,14 @@ export function getAppointmentWhatsAppText(
     ? `Procedure: ${procedure.trim()}\n`
     : '';
 
+  const formattedTime = formatTimeAMPM(time);
+
   return `Hello ${patientName},
 
 This is an appointment reminder from ${clinicName} (${doctorName}) for your scheduled dental visit:
 
 Date: ${date}
-Time: ${time}
+Time: ${formattedTime}
 ${procedureLine}Clinic: ${address}
 
 For directions, assistance, or rescheduling, please call or WhatsApp ${clinicPhone}.`;

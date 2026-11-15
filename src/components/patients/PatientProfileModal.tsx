@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useClinic } from '../../context/ClinicContext';
 import { Odontogram } from '../odontogram/Odontogram';
 import { getWhatsAppUrl, getAppointmentWhatsAppText } from '../../utils/whatsapp';
-import { formatINR, formatIndianDate } from '../../utils/currency';
+import { formatINR, formatIndianDate, formatTimeAMPM } from '../../utils/currency';
 import logoIcon from '../../assets/smile7-logo-icon.png';
 import type { PatientVisit, VisitType } from '../../types';
 import { 
@@ -432,7 +432,7 @@ export const PatientProfileModal: React.FC<PatientProfileModalProps> = ({
                           <div className="min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="font-extrabold text-xs text-slate-900">
-                                {formatIndianDate(v.date)} {v.time ? `• ${v.time}` : ''}
+                                {formatIndianDate(v.date)} {v.time ? `• ${formatTimeAMPM(v.time)}` : ''}
                               </span>
                               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-50 text-[#004884] border border-sky-200 shrink-0">
                                 {v.visitType}
@@ -774,7 +774,7 @@ ${v.nextVisitDate ? `- Next Sitting: ${formatIndianDate(v.nextVisitDate)}` : ''}
                       <div>
                         <span className="font-bold text-xs text-slate-900">{appt.procedure}</span>
                         <p className="text-[11px] text-slate-500">
-                          {formatIndianDate(appt.date)} at {appt.startTime} ({appt.durationMin} mins) • {appt.chair}
+                          {formatIndianDate(appt.date)} at {formatTimeAMPM(appt.startTime)} ({appt.durationMin} mins) • {appt.chair}
                         </p>
                       </div>
                       <div className="flex items-center gap-2 flex-wrap shrink-0">
@@ -784,7 +784,7 @@ ${v.nextVisitDate ? `- Next Sitting: ${formatIndianDate(v.nextVisitDate)}` : ''}
                             getAppointmentWhatsAppText(
                               appt.patientName,
                               formatIndianDate(appt.date),
-                              appt.startTime,
+                              formatTimeAMPM(appt.startTime),
                               clinicProfile.clinicName,
                               appt.doctor,
                               clinicProfile.phone,
@@ -933,9 +933,16 @@ ${v.nextVisitDate ? `- Next Sitting: ${formatIndianDate(v.nextVisitDate)}` : ''}
                   </div>
 
                   <div>
-                    <label className="text-xs font-bold text-slate-700 block mb-1">
-                      Sitting Time
-                    </label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs font-bold text-slate-700">
+                        Sitting Time
+                      </label>
+                      {visitTime && (
+                        <span className="text-[10px] font-extrabold text-[#004884] bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">
+                          {formatTimeAMPM(visitTime)}
+                        </span>
+                      )}
+                    </div>
                     <input
                       type="time"
                       value={visitTime}

@@ -6,7 +6,7 @@
 import { Capacitor } from '@capacitor/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import type { Appointment, ClinicProfile } from '../types';
-import { formatIndianDate } from './currency';
+import { formatIndianDate, formatTimeAMPM } from './currency';
 
 /**
  * Deterministic integer hash for notification IDs (Android/Capacitor requires 32-bit int)
@@ -63,7 +63,7 @@ export async function scheduleAppointmentPhoneReminder(
     notificationsToSchedule.push({
       id: notifId2Days,
       title: `🗓️ Appointment in 2 Days: ${appt.patientName}`,
-      body: `Dr. Manickapriya, upcoming procedure: ${appt.procedure} on ${formattedDate} at ${appt.startTime}. Phone: ${appt.patientPhone}`,
+      body: `Dr. Manickapriya, upcoming procedure: ${appt.procedure} on ${formattedDate} at ${formatTimeAMPM(appt.startTime)}. Phone: ${appt.patientPhone}`,
       schedule: { at: twoDaysBefore, allowWhileIdle: true },
       sound: 'default',
       smallIcon: 'ic_launcher',
@@ -79,7 +79,7 @@ export async function scheduleAppointmentPhoneReminder(
   if (morningOf.getTime() > now.getTime() && apptDateTime.getTime() > now.getTime()) {
     notificationsToSchedule.push({
       id: notifIdDayOf,
-      title: `🦷 Today's Appointment: ${appt.patientName} (${appt.startTime})`,
+      title: `🦷 Today's Appointment: ${appt.patientName} (${formatTimeAMPM(appt.startTime)})`,
       body: `Procedure: ${appt.procedure} • Chair: ${appt.chair || 'Dental Chair'}. Phone: ${appt.patientPhone}`,
       schedule: { at: morningOf, allowWhileIdle: true },
       sound: 'default',
@@ -231,7 +231,7 @@ export function getTwoDayAdvancePatientWhatsAppText(
     `Hello ${appt.patientName},\n\n` +
     `This is a gentle reminder of your upcoming dental appointment in 2 days with ${clinicProfile.doctorName} at ${clinicProfile.clinicName}:\n\n` +
     `🗓️ *Date:* ${formattedDate}\n` +
-    `⏰ *Time:* ${appt.startTime}\n` +
+    `⏰ *Time:* ${formatTimeAMPM(appt.startTime)}\n` +
     `🦷 *Treatment:* ${appt.procedure}\n` +
     `📍 *Location:* ${clinicProfile.address}, ${clinicProfile.city}\n\n` +
     `If you need to reschedule or have any queries, please let us know or call ${clinicProfile.phone}.\n\n` +
@@ -256,3 +256,4 @@ export function getUpcomingAppointmentsInNext48Hours(appointments: Appointment[]
     return timeA - timeB;
   });
 }
+

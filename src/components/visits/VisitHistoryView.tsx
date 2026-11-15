@@ -24,7 +24,7 @@ import {
   ArrowUpDown,
   Sparkles
 } from 'lucide-react';
-import { formatINR, formatIndianDate } from '../../utils/currency';
+import { formatINR, formatIndianDate, formatTimeAMPM } from '../../utils/currency';
 import { getWhatsAppUrl } from '../../utils/whatsapp';
 import type { PatientVisit, VisitType } from '../../types';
 import logoIcon from '../../assets/smile7-logo-icon.png';
@@ -470,7 +470,7 @@ export const VisitHistoryView: React.FC<VisitHistoryViewProps> = ({
                     <p className="text-xs text-slate-500 mt-1 flex items-center gap-3">
                       <span className="flex items-center gap-1 font-medium">
                         <Calendar className="w-3.5 h-3.5 text-[#004884]" />
-                        {formatIndianDate(visit.date)} {visit.time ? `• ${visit.time}` : ''}
+                        {formatIndianDate(visit.date)} {visit.time ? `• ${formatTimeAMPM(visit.time)}` : ''}
                       </span>
                       <span className="flex items-center gap-1 font-medium text-slate-700">
                         <Stethoscope className="w-3.5 h-3.5 text-sky-600" />
@@ -1132,7 +1132,7 @@ Thank you for your visit! Call +91 97908 62510 for any questions.`
                           <span className="px-2 py-0.5 rounded-md bg-[#004884] text-white font-black text-[11px]">
                             Sitting #{v.visitNumber}
                           </span>
-                          <span className="font-bold text-slate-800">{formatIndianDate(v.date)} {v.time ? `(${v.time})` : ''}</span>
+                          <span className="font-bold text-slate-800">{formatIndianDate(v.date)} {v.time ? `(${formatTimeAMPM(v.time)})` : ''}</span>
                           <span className="text-slate-500 font-medium">• {v.visitType}</span>
                         </div>
                         <span className="font-bold text-slate-700">Dr. {v.doctor.replace('Dr. ', '')}</span>

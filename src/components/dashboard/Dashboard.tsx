@@ -15,7 +15,7 @@ import {
   MessageSquare
 } from 'lucide-react';
 import { getWhatsAppUrl, getAppointmentWhatsAppText } from '../../utils/whatsapp';
-import { formatIndianDate } from '../../utils/currency';
+import { formatIndianDate, formatTimeAMPM } from '../../utils/currency';
 
 interface DashboardProps {
   onNavigateTab: (tab: string) => void;
@@ -89,67 +89,103 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
       {/* KPI Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Total Patients */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2">
+        {/* Total Patients - Clickable redirect to Patient List */}
+        <div 
+          onClick={() => onNavigateTab('patients')}
+          className="bg-white p-5 rounded-2xl border border-slate-200 hover:border-[#004884] shadow-2xs hover:shadow-md transition-all space-y-2 cursor-pointer group"
+          title="Click to view full Patient Directory"
+        >
           <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-bold">Total Patients</span>
-            <div className="p-2 rounded-xl bg-sky-50 text-[#004884]">
+            <span className="text-xs font-bold group-hover:text-[#004884] transition-colors">Total Patients</span>
+            <div className="p-2 rounded-xl bg-sky-50 text-[#004884] group-hover:bg-[#004884] group-hover:text-white transition-colors">
               <Users className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-black text-slate-900 tracking-tight">
-            {totalPatients}
-          </p>
+          <div className="flex items-baseline justify-between">
+            <p className="text-2xl font-black text-slate-900 tracking-tight group-hover:text-[#004884] transition-colors">
+              {totalPatients}
+            </p>
+            <span className="text-[11px] font-bold text-[#004884] flex items-center gap-0.5 opacity-90 group-hover:translate-x-0.5 transition-transform">
+              View List <ChevronRight className="w-3 h-3" />
+            </span>
+          </div>
           <p className="text-[11px] text-slate-400 font-medium">
             Active clinic dossiers
           </p>
         </div>
 
-        {/* Today's Appointments */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2">
+        {/* Today's Appointments - Clickable redirect to Appointments */}
+        <div 
+          onClick={() => onNavigateTab('appointments')}
+          className="bg-white p-5 rounded-2xl border border-slate-200 hover:border-[#004884] shadow-2xs hover:shadow-md transition-all space-y-2 cursor-pointer group"
+          title="Click to view Chair Schedule"
+        >
           <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-bold">Today's Chair Queue</span>
-            <div className="p-2 rounded-xl bg-sky-50 text-[#004884]">
+            <span className="text-xs font-bold group-hover:text-[#004884] transition-colors">Today's Chair Queue</span>
+            <div className="p-2 rounded-xl bg-sky-50 text-[#004884] group-hover:bg-[#004884] group-hover:text-white transition-colors">
               <Clock className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-black text-slate-900 tracking-tight">
-            {todayAppts.length}
-          </p>
+          <div className="flex items-baseline justify-between">
+            <p className="text-2xl font-black text-slate-900 tracking-tight group-hover:text-[#004884] transition-colors">
+              {todayAppts.length}
+            </p>
+            <span className="text-[11px] font-bold text-[#004884] flex items-center gap-0.5 opacity-90 group-hover:translate-x-0.5 transition-transform">
+              View Chairs <ChevronRight className="w-3 h-3" />
+            </span>
+          </div>
           <p className="text-[11px] text-blue-600 font-medium">
             {todayAppts.filter(a => a.status === 'Completed').length} completed
           </p>
         </div>
 
-        {/* Total Settled Revenue */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2">
+        {/* Total Settled Revenue - Clickable redirect to Billing */}
+        <div 
+          onClick={() => onNavigateTab('billing')}
+          className="bg-white p-5 rounded-2xl border border-slate-200 hover:border-emerald-600 shadow-2xs hover:shadow-md transition-all space-y-2 cursor-pointer group"
+          title="Click to view Billing & Invoices"
+        >
           <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-bold">Total Collections</span>
-            <div className="p-2 rounded-xl bg-emerald-50 text-emerald-700">
+            <span className="text-xs font-bold group-hover:text-emerald-700 transition-colors">Total Collections</span>
+            <div className="p-2 rounded-xl bg-emerald-50 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
               <CreditCard className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-black text-slate-900 tracking-tight">
-            {clinicProfile.currencySymbol || '₹'}{' '}
-            {totalPaid.toLocaleString('en-IN', { minimumFractionDigits: 0 })}
-          </p>
+          <div className="flex items-baseline justify-between">
+            <p className="text-2xl font-black text-slate-900 tracking-tight group-hover:text-emerald-700 transition-colors">
+              {clinicProfile.currencySymbol || '₹'}{' '}
+              {totalPaid.toLocaleString('en-IN', { minimumFractionDigits: 0 })}
+            </p>
+            <span className="text-[11px] font-bold text-emerald-700 flex items-center gap-0.5 opacity-90 group-hover:translate-x-0.5 transition-transform">
+              Ledger <ChevronRight className="w-3 h-3" />
+            </span>
+          </div>
           <p className="text-[11px] text-emerald-600 font-medium">
             Across {invoices.length} invoices
           </p>
         </div>
 
-        {/* Outstanding Receivables */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2">
+        {/* Outstanding Receivables - Clickable redirect to Billing */}
+        <div 
+          onClick={() => onNavigateTab('billing')}
+          className="bg-white p-5 rounded-2xl border border-slate-200 hover:border-amber-500 shadow-2xs hover:shadow-md transition-all space-y-2 cursor-pointer group"
+          title="Click to view Unsettled Dues"
+        >
           <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-bold">Pending Dues</span>
-            <div className="p-2 rounded-xl bg-amber-50 text-amber-700">
+            <span className="text-xs font-bold group-hover:text-amber-700 transition-colors">Pending Dues</span>
+            <div className="p-2 rounded-xl bg-amber-50 text-amber-700 group-hover:bg-amber-600 group-hover:text-white transition-colors">
               <AlertTriangle className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-black text-slate-900 tracking-tight">
-            {clinicProfile.currencySymbol || '₹'}{' '}
-            {totalOutstanding.toLocaleString('en-IN', { minimumFractionDigits: 0 })}
-          </p>
+          <div className="flex items-baseline justify-between">
+            <p className="text-2xl font-black text-slate-900 tracking-tight group-hover:text-amber-700 transition-colors">
+              {clinicProfile.currencySymbol || '₹'}{' '}
+              {totalOutstanding.toLocaleString('en-IN', { minimumFractionDigits: 0 })}
+            </p>
+            <span className="text-[11px] font-bold text-amber-700 flex items-center gap-0.5 opacity-90 group-hover:translate-x-0.5 transition-transform">
+              View Dues <ChevronRight className="w-3 h-3" />
+            </span>
+          </div>
           <p className="text-[11px] text-amber-600 font-medium">
             Unsettled patient balances
           </p>
@@ -198,9 +234,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   className="p-4 rounded-xl border border-slate-200/80 hover:border-slate-300 bg-slate-50/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition-colors"
                 >
                   <div className="flex items-center gap-3.5">
-                    <div className="w-12 text-center shrink-0">
+                    <div className="w-16 text-center shrink-0">
                       <span className="block text-xs font-black text-slate-900 leading-none">
-                        {appt.startTime}
+                        {formatTimeAMPM(appt.startTime)}
                       </span>
                       <span className="text-[10px] text-slate-400 font-bold">
                         {appt.durationMin}m
@@ -220,7 +256,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                             getAppointmentWhatsAppText(
                               appt.patientName,
                               formatIndianDate(appt.date),
-                              appt.startTime,
+                              formatTimeAMPM(appt.startTime),
                               clinicProfile.clinicName,
                               appt.doctor,
                               clinicProfile.phone,

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useClinic } from '../../context/ClinicContext';
 import { X, Calendar, Clock, Armchair, MessageSquare, Bell, Smartphone, ExternalLink } from 'lucide-react';
 import { getWhatsAppUrl, getAppointmentWhatsAppText } from '../../utils/whatsapp';
-import { formatIndianDate } from '../../utils/currency';
+import { formatIndianDate, formatTimeAMPM } from '../../utils/currency';
 import type { Appointment } from '../../types';
 import { 
   scheduleAppointmentPhoneReminder, 
@@ -84,7 +84,7 @@ export const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
       const msg = getAppointmentWhatsAppText(
         selectedPatient.name,
         formatIndianDate(date),
-        startTime,
+        formatTimeAMPM(startTime),
         clinicProfile.clinicName,
         clinicProfile.doctorName,
         clinicProfile.phone,
@@ -157,9 +157,16 @@ export const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
             </div>
 
             <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1">
-                Start Time *
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs font-bold text-slate-700">
+                  Start Time *
+                </label>
+                {startTime && (
+                  <span className="text-[10px] font-extrabold text-[#004884] bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">
+                    {formatTimeAMPM(startTime)}
+                  </span>
+                )}
+              </div>
               <input
                 type="time"
                 required

@@ -22,7 +22,7 @@ import {
   scheduleAppointmentPhoneReminder
 } from '../../utils/appointmentReminders';
 import { getWhatsAppUrl } from '../../utils/whatsapp';
-import { formatIndianDate } from '../../utils/currency';
+import { formatIndianDate, formatTimeAMPM } from '../../utils/currency';
 
 interface NavbarProps {
   onOpenNewPatient: () => void;
@@ -239,7 +239,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                                 {appt.patientName}
                               </span>
                               <span className="text-[10px] bg-sky-50 text-[#004884] font-bold px-1.5 py-0.5 rounded border border-sky-200">
-                                {appt.startTime}
+                                {formatTimeAMPM(appt.startTime)}
                               </span>
                             </div>
                             <p className="text-[11px] text-slate-500 font-medium mt-0.5">
