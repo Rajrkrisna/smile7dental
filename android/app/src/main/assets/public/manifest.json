@@ -1,0 +1,23 @@
+{
+  "short_name": "Smile7 Dental",
+  "name": "Smile7 Dental Clinic Practice OS",
+  "description": "Offline practice management and patient clinical software for Smile7 Dental Clinic",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/assets/smile7-logo-icon.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#004884",
+  "theme_color": "#004884",
+  "display": "standalone",
+  "orientation": "portrait"
+}

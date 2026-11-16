@@ -1,0 +1,84 @@
+name: Build Smile7 Dental iOS App
+
+on:
+  push:
+    branches: [ mobile-app, main ]
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-ios:
+    name: Build iOS App & Package
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Node Dependencies
+        run: npm ci
+
+      - name: Build Web Application
+        run: npm run build
+
+      - name: Sync iOS Capacitor Project
+        run: npx cap sync ios
+
+      - name: Select Xcode Version
+        run: |
+          sudo xcode-select -s /Applications/Xcode_16.0.app || sudo xcode-select -s /Applications/Xcode.app
+          xcodebuild -version
+
+      - name: Build Xcode Archive
+        run: |
+          mkdir -p build-output
+          xcodebuild archive \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath build-output/Smile7Dental.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            COMPILER_INDEX_STORE_ENABLE=NO
+
+      - name: Package Payload and IPA
+        run: |
+          cd build-output
+          mkdir -p Payload
+          cp -r Smile7Dental.xcarchive/Products/Applications/App.app Payload/Smile7Dental.app
+          zip -r Smile7Dental-Clinic-iOS.ipa Payload
+          zip -r Smile7Dental-Xcode-Project.zip ../ios/App
+          ls -lh
+
+      - name: Upload iOS Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Smile7Dental-iOS-Package
+          path: |
+            build-output/Smile7Dental-Clinic-iOS.ipa
+            build-output/Smile7Dental-Xcode-Project.zip
+          retention-days: 30
+
+      - name: Publish to GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/mobile-app' || startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        with:
+          tag_name: mobile-latest
+          name: Smile7 Dental Clinic Mobile Suite (Android & iOS)
+          files: |
+            build-output/Smile7Dental-Clinic-iOS.ipa
+            build-output/Smile7Dental-Xcode-Project.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
