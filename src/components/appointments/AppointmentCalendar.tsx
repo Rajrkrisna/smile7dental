@@ -124,17 +124,17 @@ export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
   const statuses = ['All', 'In-Chair', 'Scheduled', 'Checked-In', 'Completed'];
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 sm:space-y-5 max-w-full overflow-hidden">
       {/* Top Header & Date Navigation */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-4">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="bg-white p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs space-y-3 sm:space-y-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
           <div>
-            <div className="flex items-center gap-2">
-              <h2 className="font-black text-lg text-slate-900 tracking-tight">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 className="font-black text-base sm:text-lg text-slate-900 tracking-tight">
                 Dental Chair Schedule & Appointments
               </h2>
-              <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-sky-50 text-[#004884] border border-sky-200">
-                1 Dental Chair Operatory
+              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-sky-50 text-[#004884] border border-sky-200">
+                1 Chair Operatory
               </span>
             </div>
             <p className="text-xs text-slate-500 mt-0.5">
@@ -145,7 +145,7 @@ export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
           <button
             type="button"
             onClick={onOpenNewAppointment}
-            className="px-4 py-2.5 rounded-xl bg-[#004884] hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs shadow-[#004884]/20 cursor-pointer"
+            className="w-full sm:w-auto justify-center px-4 py-2.5 rounded-xl bg-[#004884] hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs shadow-[#004884]/20 cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             Book Chair Slot

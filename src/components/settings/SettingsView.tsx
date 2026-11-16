@@ -117,10 +117,10 @@ export const SettingsView: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 max-w-full overflow-hidden">
       {/* Top Header */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs">
-        <h2 className="font-black text-lg text-slate-900 tracking-tight">
+      <div className="bg-white p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs">
+        <h2 className="font-black text-base sm:text-lg text-slate-900 tracking-tight">
           Clinic Settings & Offline Backups
         </h2>
         <p className="text-xs text-slate-500">
@@ -129,7 +129,7 @@ export const SettingsView: React.FC = () => {
       </div>
 
       {/* GitHub Cloud Database Sync Section */}
-      <div className="bg-gradient-to-br from-white via-slate-50/50 to-sky-50/30 rounded-2xl border border-sky-100 shadow-xs p-6 space-y-6">
+      <div className="bg-gradient-to-br from-white via-slate-50/50 to-sky-50/30 rounded-xl sm:rounded-2xl border border-sky-100 shadow-xs p-4 sm:p-6 space-y-4 sm:space-y-6">
         {/* Header & Status */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
           <div className="flex items-center gap-3">

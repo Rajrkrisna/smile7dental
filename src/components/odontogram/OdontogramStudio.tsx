@@ -25,11 +25,11 @@ export const OdontogramStudio: React.FC<OdontogramStudioProps> = ({
   const activePatient = patients.find(p => p.id === selectedPatientId);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 max-w-full overflow-hidden">
       {/* Top Patient Selector Bar */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="bg-white p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h2 className="font-black text-lg text-slate-900 tracking-tight">
+          <h2 className="font-black text-base sm:text-lg text-slate-900 tracking-tight">
             Clinical Odontogram & Teeth Studio
           </h2>
           <p className="text-xs text-slate-500">

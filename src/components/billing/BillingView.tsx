@@ -51,12 +51,12 @@ export const BillingView: React.FC<BillingViewProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 max-w-full overflow-hidden">
       {/* Top Header & Fast Stats */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-4">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="bg-white p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs space-y-3 sm:space-y-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
           <div>
-            <h2 className="font-black text-lg text-slate-900 tracking-tight">
+            <h2 className="font-black text-base sm:text-lg text-slate-900 tracking-tight">
               Invoices & Practice Billing
             </h2>
             <p className="text-xs text-slate-500">
@@ -67,7 +67,7 @@ export const BillingView: React.FC<BillingViewProps> = ({
           <button
             type="button"
             onClick={onOpenNewInvoice}
-            className="px-4 py-2.5 rounded-xl bg-[#004884] hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs shadow-[#004884]/20 cursor-pointer"
+            className="w-full sm:w-auto justify-center px-4 py-2.5 rounded-xl bg-[#004884] hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs shadow-[#004884]/20 cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             Create Dental Bill (Rs.)

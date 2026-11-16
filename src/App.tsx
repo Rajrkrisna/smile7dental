@@ -53,7 +53,7 @@ const DentalAppMain: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans w-full max-w-full overflow-x-hidden">
       {/* Top Navigation */}
       <Navbar
         onOpenNewPatient={() => setIsNewPatientOpen(true)}
@@ -63,7 +63,7 @@ const DentalAppMain: React.FC = () => {
       />
 
       {/* Main Workspace Frame */}
-      <main className="max-w-7xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-6 flex-1 flex flex-col md:flex-row gap-4 sm:gap-6">
+      <main className="max-w-7xl mx-auto w-full px-2.5 sm:px-6 py-3 sm:py-6 flex-1 flex flex-col md:flex-row gap-3 sm:gap-6 min-w-0 max-w-full overflow-x-hidden">
         {/* Navigation Sidebar */}
         <Sidebar
           activeTab={activeTab}
@@ -71,7 +71,7 @@ const DentalAppMain: React.FC = () => {
         />
 
         {/* Dynamic Content Views */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 max-w-full overflow-x-hidden">
           {activeTab === 'dashboard' && (
             <Dashboard
               onNavigateTab={setActiveTab}

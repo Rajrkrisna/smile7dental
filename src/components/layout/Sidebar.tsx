@@ -43,9 +43,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   return (
-    <aside className="w-full md:w-64 shrink-0 space-y-4">
+    <aside className="w-full md:w-64 shrink-0 space-y-4 max-w-full overflow-hidden">
       {/* Navigation List */}
-      <nav className="bg-white p-2 rounded-2xl border border-slate-200 shadow-xs flex md:flex-col gap-1 overflow-x-auto scrollbar-none">
+      <nav className="bg-white p-1.5 sm:p-2 rounded-xl sm:rounded-2xl border border-slate-200 shadow-xs flex md:flex-col gap-1 overflow-x-auto scrollbar-none max-w-full">
         {menuItems.map(item => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -55,14 +55,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
               key={item.id}
               type="button"
               onClick={() => onTabChange(item.id)}
-              className={`flex items-center justify-between p-2.5 sm:p-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap md:w-full cursor-pointer shrink-0 ${
+              className={`flex items-center justify-between p-2 sm:p-3 rounded-lg sm:rounded-xl text-xs font-bold transition-all whitespace-nowrap md:w-full cursor-pointer shrink-0 ${
                 isActive
                   ? 'bg-sky-50 text-[#004884] border border-sky-200/80 shadow-2xs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <Icon className={`w-4 h-4 ${isActive ? 'text-[#004884]' : 'text-slate-400'}`} />
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#004884]' : 'text-slate-400'}`} />
                 <span>{item.label}</span>
               </div>
 

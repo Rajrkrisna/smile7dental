@@ -258,15 +258,15 @@ export const FinanceView: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 max-w-full overflow-hidden">
       {/* Top Header */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-white p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4">
         <div>
           <div className="flex items-center gap-2">
             <span className="p-1.5 rounded-lg bg-sky-50 text-[#004884]">
               <Wallet className="w-5 h-5" />
             </span>
-            <h2 className="font-black text-lg text-slate-900 tracking-tight">
+            <h2 className="font-black text-base sm:text-lg text-slate-900 tracking-tight">
               Clinic Finance & Accounts Management
             </h2>
           </div>
@@ -275,97 +275,97 @@ export const FinanceView: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
           <button
             type="button"
             onClick={() => setIsAddConsultantOpen(true)}
-            className="px-3.5 py-2 bg-[#004884] hover:bg-sky-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+            className="flex-1 sm:flex-none justify-center px-3 sm:px-3.5 py-2 bg-[#004884] hover:bg-sky-700 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
           >
             <Stethoscope className="w-3.5 h-3.5" />
-            <span>+ Pay Consultant</span>
+            <span>+ Consultant</span>
           </button>
           <button
             type="button"
             onClick={() => setIsAddLabOpen(true)}
-            className="px-3.5 py-2 bg-purple-700 hover:bg-purple-800 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+            className="flex-1 sm:flex-none justify-center px-3 sm:px-3.5 py-2 bg-purple-700 hover:bg-purple-800 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
           >
             <FlaskConical className="w-3.5 h-3.5" />
-            <span>+ New Lab Order</span>
+            <span>+ Lab Order</span>
           </button>
           <button
             type="button"
             onClick={() => setIsAddExpenseOpen(true)}
-            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+            className="flex-1 sm:flex-none justify-center px-3 sm:px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>+ Log Expense</span>
+            <span>+ Expense</span>
           </button>
         </div>
       </div>
 
       {/* Top 4 KPI Metric Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         {/* Collections */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2">
+        <div className="bg-white p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs space-y-1.5 sm:space-y-2 min-w-0">
           <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-bold">Total Patient Income</span>
-            <div className="p-2 rounded-xl bg-emerald-50 text-emerald-700">
-              <TrendingUp className="w-4 h-4" />
+            <span className="text-[11px] sm:text-xs font-bold truncate">Total Income</span>
+            <div className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl bg-emerald-50 text-emerald-700 shrink-0">
+              <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <p className="text-2xl font-black text-slate-900 tracking-tight">
+          <p className="text-base sm:text-2xl font-black text-slate-900 tracking-tight truncate">
             {formatINR(totalCollections)}
           </p>
-          <p className="text-[11px] text-emerald-600 font-medium">
-            From {invoices.length} patient bills
+          <p className="text-[10px] sm:text-[11px] text-emerald-600 font-medium truncate">
+            From {invoices.length} bills
           </p>
         </div>
 
         {/* Total Expenses */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2">
+        <div className="bg-white p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs space-y-1.5 sm:space-y-2 min-w-0">
           <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-bold">Total Practice Expenses</span>
-            <div className="p-2 rounded-xl bg-rose-50 text-rose-700">
-              <TrendingDown className="w-4 h-4" />
+            <span className="text-[11px] sm:text-xs font-bold truncate">Total Expenses</span>
+            <div className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl bg-rose-50 text-rose-700 shrink-0">
+              <TrendingDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <p className="text-2xl font-black text-slate-900 tracking-tight">
+          <p className="text-base sm:text-2xl font-black text-slate-900 tracking-tight truncate">
             {formatINR(totalExpenses)}
           </p>
-          <p className="text-[11px] text-rose-600 font-medium">
-            Consultants, Labs & OPEX
+          <p className="text-[10px] sm:text-[11px] text-rose-600 font-medium truncate">
+            Consultants, Labs & Costs
           </p>
         </div>
 
         {/* Net Profit */}
-        <div className="bg-gradient-to-br from-[#002244] to-[#004884] text-white p-5 rounded-2xl shadow-xs space-y-2">
+        <div className="bg-gradient-to-br from-[#002244] to-[#004884] text-white p-3.5 sm:p-5 rounded-xl sm:rounded-2xl shadow-xs space-y-1.5 sm:space-y-2 min-w-0">
           <div className="flex items-center justify-between text-sky-200">
-            <span className="text-xs font-bold">Net Practice Cashflow</span>
-            <div className="p-1.5 rounded-lg bg-white/10 text-sky-200">
-              <Wallet className="w-4 h-4" />
+            <span className="text-[11px] sm:text-xs font-bold truncate">Net Cashflow</span>
+            <div className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl bg-white/10 text-sky-200 shrink-0">
+              <Wallet className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <p className="text-2xl font-black tracking-tight text-white">
+          <p className="text-base sm:text-2xl font-black tracking-tight text-white truncate">
             {formatINR(netProfit)}
           </p>
-          <p className="text-[11px] text-sky-200 font-medium">
-            {profitMargin}% Operational Margin
+          <p className="text-[10px] sm:text-[11px] text-sky-200 font-medium truncate">
+            {profitMargin}% Margin
           </p>
         </div>
 
         {/* Pending Payables */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2">
+        <div className="bg-white p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs space-y-1.5 sm:space-y-2 min-w-0">
           <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-bold">Pending Payables</span>
-            <div className="p-2 rounded-xl bg-amber-50 text-amber-700">
-              <Clock className="w-4 h-4" />
+            <span className="text-[11px] sm:text-xs font-bold truncate">Pending Payables</span>
+            <div className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl bg-amber-50 text-amber-700 shrink-0">
+              <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <p className="text-2xl font-black text-amber-900 tracking-tight">
+          <p className="text-base sm:text-2xl font-black text-amber-900 tracking-tight truncate">
             {formatINR(totalPendingPayables)}
           </p>
-          <p className="text-[11px] text-amber-700 font-medium">
-            Consultant: {formatINR(totalConsultantPending)} • Lab: {formatINR(totalLabPending)}
+          <p className="text-[10px] sm:text-[11px] text-amber-700 font-medium truncate">
+            Due to consultants & labs
           </p>
         </div>
       </div>

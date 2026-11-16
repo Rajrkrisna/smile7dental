@@ -123,15 +123,15 @@ export const Odontogram: React.FC<OdontogramProps> = ({
   const missingCount = findingsList.filter(f => f.condition === 'missing').length;
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-5 space-y-6">
+    <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-xs p-3.5 sm:p-5 space-y-4 sm:space-y-6 max-w-full overflow-hidden">
       {/* Header Controls: Dentition, Notation, and Fast Brush */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100">
+      <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 pb-3 sm:pb-4 border-b border-slate-100">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="font-extrabold text-base text-slate-900 tracking-tight">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-extrabold text-sm sm:text-base text-slate-900 tracking-tight">
               Interactive Odontogram (Teeth Chart)
             </span>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-sky-50 text-[#004884] font-bold border border-sky-200">
+            <span className="text-[11px] sm:text-xs px-2 py-0.5 rounded-full bg-sky-50 text-[#004884] font-bold border border-sky-200">
               {dentition === 'adult' ? 'Adult (32 Teeth)' : 'Pediatric (20 Deciduous)'}
             </span>
           </div>
@@ -141,13 +141,13 @@ export const Odontogram: React.FC<OdontogramProps> = ({
         </div>
 
         {/* View Switches */}
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
           {/* Adult / Pediatric Switch */}
           <div className="inline-flex p-1 bg-slate-100 rounded-xl text-xs font-bold">
             <button
               type="button"
               onClick={() => setDentition('adult')}
-              className={`px-3 py-1.5 rounded-lg transition-all ${
+              className={`px-2.5 sm:px-3 py-1.5 rounded-lg transition-all ${
                 dentition === 'adult' ? 'bg-white text-[#004884] shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -156,7 +156,7 @@ export const Odontogram: React.FC<OdontogramProps> = ({
             <button
               type="button"
               onClick={() => setDentition('pediatric')}
-              className={`px-3 py-1.5 rounded-lg transition-all ${
+              className={`px-2.5 sm:px-3 py-1.5 rounded-lg transition-all ${
                 dentition === 'pediatric' ? 'bg-white text-[#004884] shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -170,17 +170,18 @@ export const Odontogram: React.FC<OdontogramProps> = ({
               type="button"
               onClick={() => onChangeNotation('fdi')}
               title="FDI Two-Digit Notation (ISO 3950: 11-48) - Dental Council of India (DCI) Standard"
-              className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
+              className={`px-2.5 sm:px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
                 activeNotation === 'fdi' ? 'bg-white text-[#004884] shadow-xs font-black' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <span>FDI (India / DCI Standard)</span>
+              <span className="hidden sm:inline">FDI (India / DCI Standard)</span>
+              <span className="sm:hidden">FDI (India)</span>
             </button>
             <button
               type="button"
               onClick={() => onChangeNotation('palmer')}
               title="Palmer Notation (Quadrants: 8┘..1┘ | └1..└8)"
-              className={`px-2.5 py-1.5 rounded-lg transition-all ${
+              className={`px-2 sm:px-2.5 py-1.5 rounded-lg transition-all ${
                 activeNotation === 'palmer' ? 'bg-white text-[#004884] shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -245,7 +246,7 @@ export const Odontogram: React.FC<OdontogramProps> = ({
       </div>
 
       {/* The Graphical Mouth Grid (Maxillary & Mandibular Arches) */}
-      <div className="relative overflow-x-auto py-2">
+      <div className="relative w-full max-w-full overflow-x-auto py-2 scrollbar-thin">
         <div className="sm:hidden text-center pb-2 text-[10px] text-slate-400 font-medium">
           ↔ Slide horizontally to inspect full dental arch
         </div>
