@@ -38,8 +38,13 @@ jobs:
 
       - name: Copy Web Application Assets to iOS
         run: |
-          npx cap copy ios
+          mkdir -p ios/App/App/public
+          cp -r dist/* ios/App/App/public/
           ls -la ios/App/App/public/
+
+      - name: Resolve Swift Package Dependencies
+        run: |
+          xcodebuild -resolvePackageDependencies -project ios/App/App.xcodeproj
 
       - name: Build iOS Application (No Code Signing Required)
         run: |
